@@ -1,26 +1,94 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
-  --color-background: var(--background);
+  --color-background: var(--color-background);
+  --color-surface: var(--color-surface);
+  --color-border-theme: var(--color-border);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-gold: var(--brand-gold);
+  --color-gold-hover: var(--brand-gold-hover);
+  --color-silver: var(--brand-silver);
+  --color-silver-dark: var(--brand-silver-dark);
+  --color-onyx: var(--brand-onyx);
+  --font-sans: var(--font-inter), sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  /* Light theme variables */
+  --color-primary: #0a3b6f; /* brand primary color */
+  --color-background: #fffbf5; /* existing background */
+  --color-surface: #ffffff; /* panels, cards */
+  --color-text: #2d2620; /* existing foreground */
+  --color-border: #e0e0e0; /* light border */
+  --color-accent: var(--brand-gold); /* gold accent */
+  /* Preserve brand colors */
+  --brand-gold: #c9a96e;
+  --brand-gold-hover: #b39558;
+  --brand-silver: #7a6f67;
+  --brand-silver-dark: #5a5550;
+  --brand-onyx: #3d3530;
+}
+
+/* Dark theme overrides */
+.dark {
+  --color-primary: #0a3b6f;
+  --color-background: #000000;
+  --color-surface: #1e1e1e;
+  --color-text: var(--brand-gold);
+  --color-border: #333333;
+  --color-accent: var(--brand-gold);
 }
 
 body {
-  background: var(--background);
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Glassmorphism Premium */
+.glass-panel {
+  background: var(--color-surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+}
+
+/* Utility for smooth theme changes */
+.theme-transition {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+
+/* CSS Nesting & :has() para os cards de plano */
+.plan-card {
+  transition: all 0.3s ease;
+  border: 2px solid var(--brand-gold);
+  background: #ffffff;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  box-shadow: 0 2px 8px rgba(45, 38, 32, 0.08);
+}
+
+.plan-card:has(button:hover), .plan-card:hover {
+  border-color: var(--brand-gold);
+  box-shadow: 0 8px 24px rgba(201, 169, 110, 0.2);
+  transform: translateY(-4px);
+}
+
+/* Ticker Animation */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
 }
