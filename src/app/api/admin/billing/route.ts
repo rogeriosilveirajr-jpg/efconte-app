@@ -8,7 +8,7 @@ export async function GET() {
       include: { plan: true, tenant: true }
     });
 
-    const mrr = subscriptions.reduce((acc, sub) => acc + sub.plan.price, 0);
+    const mrr = subscriptions.reduce((acc: number, sub: any) => acc + sub.plan.price, 0);
 
     const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
     const endOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
@@ -25,8 +25,8 @@ export async function GET() {
     
     // Inadimplencia (Vencidas e Pendentes)
     const inadimplencia = invoices
-      .filter(i => i.status === 'Pending' && new Date(i.dueDate) < new Date())
-      .reduce((acc, inv) => acc + inv.totalAmount, 0);
+      .filter((i: any) => i.status === 'Pending' && new Date(i.dueDate) < new Date())
+      .reduce((acc: number, inv: any) => acc + inv.totalAmount, 0);
 
     // Mocks / Simplificações para visualização imediata do MRR / Avulso:
     // Na nossa lógica atual, as faturas possuem "totalAmount" e não desmembramos aqui perfeitamente os "invoiceItems".
