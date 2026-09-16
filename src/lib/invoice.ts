@@ -24,7 +24,7 @@ export async function addInvoiceItem(tenantId: string, description: string, amou
       include: { plan: true }
     });
     
-    const baseAmount = subscription ? subscription.plan.price : 0.0;
+    const baseAmount = subscription ? subscription.plan.basePrice : 0.0;
     
     invoice = await prisma.invoice.create({
       data: {

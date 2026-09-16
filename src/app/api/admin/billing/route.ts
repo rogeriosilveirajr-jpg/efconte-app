@@ -8,7 +8,7 @@ export async function GET() {
       include: { plan: true, tenant: true }
     });
 
-    const mrr = subscriptions.reduce((acc: number, sub: any) => acc + sub.plan.price, 0);
+    const mrr = subscriptions.reduce((acc: number, sub: any) => acc + sub.plan.basePrice, 0);
 
     const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
     const endOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
