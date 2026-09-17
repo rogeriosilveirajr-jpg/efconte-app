@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Building, Search, ChevronRight, FileText, Users, AlertCircle } from "lucide-react";
+import { Building, Search, ChevronRight, FileText, Users, AlertCircle, Plus, X, Key } from "lucide-react";
 
 type Tenant = {
   id: string;
@@ -16,21 +16,51 @@ export default function MeusClientesPage() {
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  
+  // Modal de Criação
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({ name: '', cnpj: '', email: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successData, setSuccessData] = useState<{email: string, password: string} | null>(null);
 
   useEffect(() => {
-    async function fetchTenants() {
-      try {
-        const res = await fetch('/api/admin/tenants');
-        const data = await res.json();
-        setTenants(data.tenants || []);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    }
     fetchTenants();
   }, []);
+
+  async function fetchTenants() {
+    try {
+      const res = await fetch('/api/admin/tenants');
+      const data = await res.json();
+      setTenants(data.tenants || []);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleCreateClient = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const res = await fetch('/api/admin/tenants', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSuccessData({ email: formData.email, password: data.generatedPassword });
+        fetchTenants(); // Recarrega a lista
+      } else {
+        alert("Erro: " + data.error);
+      }
+    } catch (e) {
+      alert("Erro de conexão");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const filteredTenants = tenants.filter(t => 
     t.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -38,7 +68,7 @@ export default function MeusClientesPage() {
   );
 
   return (
-    <div className="flex flex-col gap-8 max-w-7xl mx-auto pb-12">
+    <div className="flex flex-col gap-8 max-w-7xl mx-auto pb-12 relative">
       
       {/* Header & Search */}
       <section className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -47,19 +77,28 @@ export default function MeusClientesPage() {
             <Building className="text-gold" /> Meus Clientes
           </h1>
           <p className="text-silver-dark text-sm">
-            Gerencie as empresas (tenants) da sua carteira, planos e limites.
+            Gerencie as empresas (tenants) da sua carteira e adicione novos clientes.
           </p>
         </div>
 
-        <div className="relative w-full md:w-96">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-silver-dark" size={18} />
-          <input 
-            type="text" 
-            placeholder="Pesquisar por nome ou CNPJ..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-onyx/5 dark:bg-white/5 border border-onyx/10 dark:border-white/10 rounded-lg text-sm focus:outline-none focus:border-gold transition-colors"
-          />
+        <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+          <div className="relative w-full md:w-80">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-silver-dark" size={18} />
+            <input 
+              type="text" 
+              placeholder="Pesquisar..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-onyx/5 dark:bg-white/5 border border-onyx/10 dark:border-white/10 rounded-lg text-sm focus:outline-none focus:border-gold transition-colors"
+            />
+          </div>
+          <button 
+            onClick={() => { setSuccessData(null); setFormData({name:'', cnpj:'', email:''}); setIsModalOpen(true); }}
+            className="flex items-center justify-center gap-2 bg-gold hover:bg-gold-light text-onyx font-bold py-2.5 px-6 rounded-lg transition-colors whitespace-nowrap"
+          >
+            <Plus size={18} />
+            Novo Cliente
+          </button>
         </div>
       </section>
 
@@ -112,6 +151,92 @@ export default function MeusClientesPage() {
           </div>
         )}
       </section>
+
+      {/* Modal de Novo Cliente */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white dark:bg-onyx-light border border-onyx/10 dark:border-white/10 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+            <div className="flex items-center justify-between p-6 border-b border-onyx/10 dark:border-white/10">
+              <h2 className="text-xl font-bold">Adicionar Cliente</h2>
+              <button onClick={() => setIsModalOpen(false)} className="text-silver-dark hover:text-white transition-colors">
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div className="p-6">
+              {successData ? (
+                <div className="flex flex-col items-center text-center gap-4 py-4">
+                  <div className="w-16 h-16 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mb-2">
+                    <Key size={32} />
+                  </div>
+                  <h3 className="text-xl font-bold text-green-500">Cliente Criado!</h3>
+                  <p className="text-sm text-silver-dark">O acesso foi gerado. Copie a senha abaixo e envie para o cliente junto com o link do portal.</p>
+                  
+                  <div className="w-full bg-onyx/5 dark:bg-black/30 p-4 rounded-lg mt-4 border border-onyx/10 dark:border-white/5 text-left">
+                    <p className="text-sm text-silver-dark mb-1">Email (Login):</p>
+                    <p className="font-mono font-bold mb-4">{successData.email}</p>
+                    <p className="text-sm text-silver-dark mb-1">Senha Provisória:</p>
+                    <p className="font-mono text-gold font-bold text-lg">{successData.password}</p>
+                  </div>
+
+                  <button 
+                    onClick={() => setIsModalOpen(false)}
+                    className="w-full mt-4 bg-onyx/10 dark:bg-white/10 hover:bg-onyx/20 dark:hover:bg-white/20 font-bold py-3 rounded-lg transition-colors"
+                  >
+                    Fechar
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleCreateClient} className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-bold text-silver-dark">Nome da Empresa</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      className="w-full px-4 py-3 bg-onyx/5 dark:bg-black/20 border border-onyx/10 dark:border-white/10 rounded-lg focus:outline-none focus:border-gold"
+                      placeholder="Ex: Tech Solutions Ltda"
+                    />
+                  </div>
+                  
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-bold text-silver-dark">CNPJ</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={formData.cnpj}
+                      onChange={(e) => setFormData({...formData, cnpj: e.target.value})}
+                      className="w-full px-4 py-3 bg-onyx/5 dark:bg-black/20 border border-onyx/10 dark:border-white/10 rounded-lg focus:outline-none focus:border-gold"
+                      placeholder="00.000.000/0000-00"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-bold text-silver-dark">Email do Responsável (Login)</label>
+                    <input 
+                      type="email" 
+                      required
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      className="w-full px-4 py-3 bg-onyx/5 dark:bg-black/20 border border-onyx/10 dark:border-white/10 rounded-lg focus:outline-none focus:border-gold"
+                      placeholder="contato@empresa.com"
+                    />
+                  </div>
+
+                  <button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                    className="w-full mt-4 bg-gold hover:bg-gold-light text-onyx font-bold py-3 rounded-lg transition-colors disabled:opacity-50"
+                  >
+                    {isSubmitting ? "Criando..." : "Gerar Acesso do Cliente"}
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

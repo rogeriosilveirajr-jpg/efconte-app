@@ -2,13 +2,11 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
 
 export async function GET() {
   const session = await getServerSession(authOptions);
   
-  // Aqui você pode adicionar verificação de session.user.role === 'CONTADOR'
-  // Mas para o MVP vamos permitir a consulta.
-
   const tenants = await prisma.tenant.findMany({
     where: { isDeleted: false },
     include: {
@@ -21,4 +19,56 @@ export async function GET() {
   });
 
   return NextResponse.json({ tenants });
+}
+
+export async function POST(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    // Ideal check: if (session?.user?.role !== 'CONTADOR') return unauthorized;
+
+    const { name, cnpj, email, planId } = await request.json();
+
+    // Generate random password (6 chars)
+    const randomPassword = Math.floor(100000 + Math.random() * 900000).toString();
+    const passwordHash = await bcrypt.hash(randomPassword, 10);
+
+    // Create Tenant and User
+    const newTenant = await prisma.tenant.create({
+      data: {
+        name,
+        cnpj,
+        users: {
+          create: {
+            user: {
+              create: {
+                email,
+                passwordHash,
+                role: 'CLIENTE'
+              }
+            }
+          }
+        }
+      }
+    });
+
+    if (planId) {
+      await prisma.subscription.create({
+        data: {
+          tenantId: newTenant.id,
+          planId
+        }
+      });
+    }
+
+    // Retorna a senha gerada para exibir na tela pro contador
+    return NextResponse.json({ 
+      success: true, 
+      tenant: newTenant,
+      generatedPassword: randomPassword 
+    });
+
+  } catch (error: any) {
+    console.error(error);
+    return NextResponse.json({ error: error.message || 'Erro ao criar cliente' }, { status: 500 });
+  }
 }
