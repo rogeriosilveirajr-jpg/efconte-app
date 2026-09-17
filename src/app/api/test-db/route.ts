@@ -7,7 +7,9 @@ export async function GET() {
     const users = await prisma.user.findMany();
     return NextResponse.json({ 
       users,
-      envDbUrl: process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 40) + '...' : 'missing'
+      envDbUrl: process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 40) + '...' : 'missing',
+      // @ts-ignore
+      provider: prisma._engineConfig?.activeProvider || 'unknown'
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
