@@ -18,7 +18,7 @@ export const authOptions = {
         const isValid = await bcrypt.compare(credentials.password, user.passwordHash);
         if (!isValid) return null;
         // Return user object that will be stored in session
-        return { id: user.id.toString(), email: user.email, role: user.role };
+        return { id: user.id.toString(), email: user.email, role: user.role, name: user.name };
       },
     }),
   ],

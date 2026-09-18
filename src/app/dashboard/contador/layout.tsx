@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import {
   LayoutDashboard,
   Users,
@@ -12,7 +12,8 @@ import {
   LogOut,
   Building,
   Moon,
-  Sun
+  Sun,
+  Edit2
 } from "lucide-react";
 
 import { usePathname } from "next/navigation";
@@ -23,7 +24,23 @@ export default function AgencyDashboardLayout({
   children: ReactNode;
 }) {
   const [darkMode, setDarkMode] = useState(false);
+  const [name, setName] = useState("Carregando...");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState("");
   const pathname = usePathname();
+
+  useEffect(() => {
+    fetch('/api/auth/session')
+      .then(res => res.json())
+      .then(session => {
+        if (session && session.user) {
+          setName(session.user.name || "Seu Nome");
+        } else {
+          setName("Contador");
+        }
+      })
+      .catch(() => setName("Contador"));
+  }, []);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -31,6 +48,28 @@ export default function AgencyDashboardLayout({
       document.documentElement.classList.toggle('dark');
     }
   };
+
+  const handleEditSave = async () => {
+    if (!editName.trim()) {
+      setIsEditing(false);
+      return;
+    }
+    try {
+      setName(editName);
+      setIsEditing(false);
+      await fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: editName })
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const initials = name !== "Carregando..." && name !== "Contador" && name !== "Seu Nome" 
+    ? name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase()
+    : "CT";
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
@@ -78,12 +117,31 @@ export default function AgencyDashboardLayout({
           </div>
           
           <div className="flex items-center gap-4 ml-auto">
-            <div className="flex flex-col text-right hidden sm:flex">
-              <span className="text-sm font-bold">Eduardo Fernandes</span>
-              <span className="text-[10px] text-silver-dark uppercase font-bold tracking-wider">Contador / Sócio</span>
+            <div className="flex flex-col text-right hidden sm:flex justify-center items-end">
+              {isEditing ? (
+                <input 
+                  type="text" 
+                  value={editName}
+                  onChange={e => setEditName(e.target.value)}
+                  onBlur={handleEditSave}
+                  onKeyDown={e => e.key === 'Enter' && handleEditSave()}
+                  autoFocus
+                  className="text-sm font-bold bg-background border border-gold rounded px-2 py-0.5 outline-none text-right"
+                />
+              ) : (
+                <div 
+                  className="text-sm font-bold flex items-center gap-2 cursor-pointer hover:text-gold transition-colors group"
+                  onClick={() => { setEditName(name === "Seu Nome" ? "" : name); setIsEditing(true); }}
+                  title="Clique para editar o nome"
+                >
+                  <Edit2 size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                  {name}
+                </div>
+              )}
+              <span className="text-[10px] text-silver-dark uppercase font-bold tracking-wider">Contador</span>
             </div>
             <div className="w-10 h-10 rounded-full bg-gold flex items-center justify-center text-onyx font-bold">
-              EF
+              {initials}
             </div>
           </div>
         </header>
