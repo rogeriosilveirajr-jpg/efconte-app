@@ -5,21 +5,36 @@ import { Building, TrendingUp, AlertCircle, CalendarClock, ChevronRight, Filter,
 
 export default function AgencyDashboard() {
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [billing, setBilling] = useState<{mrr: number, avulsoMes: number}>({ mrr: 0, avulsoMes: 0 });
+  const [tenants, setTenants] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const fetchNotifications = async () => {
+  const fetchData = async () => {
     try {
-      const res = await fetch('/api/notifications');
-      const data = await res.json();
-      setNotifications(data.notifications || []);
+      const [resNotif, resBill, resTen] = await Promise.all([
+        fetch('/api/notifications'),
+        fetch('/api/admin/billing'),
+        fetch('/api/admin/tenants')
+      ]);
+
+      const dataNotif = await resNotif.json();
+      const dataBill = await resBill.json();
+      const dataTen = await resTen.json();
+
+      setNotifications(dataNotif.notifications || []);
+      setBilling({ mrr: dataBill.mrr || 0, avulsoMes: dataBill.avulsoMes || 0 });
+      setTenants(dataTen.tenants || []);
     } catch (e) {
       console.error(e);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchNotifications();
+    fetchData();
     // Poll for new notifications every 5 seconds (simulating real-time for demo)
-    const interval = setInterval(fetchNotifications, 5000);
+    const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -37,6 +52,8 @@ export default function AgencyDashboard() {
     }
   };
 
+  const pendingMeetingsCount = notifications.filter(n => n.type === 'REUNIAO').length;
+
   return (
     <div className="flex flex-col gap-8 max-w-7xl mx-auto pb-12">
       
@@ -48,7 +65,7 @@ export default function AgencyDashboard() {
         </p>
       </section>
 
-      {/* Caixa de Entrada de Solicitações (NEW) */}
+      {/* Caixa de Entrada de Solicitações */}
       <section className="mt-2">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold flex items-center gap-2">
@@ -60,7 +77,11 @@ export default function AgencyDashboard() {
           </span>
         </div>
         
-        {notifications.length === 0 ? (
+        {loading ? (
+           <div className="glass-panel border-onyx/20 dark:border-white/10 p-12 rounded-2xl flex flex-col items-center justify-center text-silver-dark text-center">
+            <p>Carregando...</p>
+          </div>
+        ) : notifications.length === 0 ? (
           <div className="glass-panel border-onyx/20 dark:border-white/10 p-12 rounded-2xl flex flex-col items-center justify-center text-silver-dark text-center">
             <Check size={48} className="mb-4 opacity-50" />
             <h3 className="text-xl font-bold text-foreground">Inbox Zero!</h3>
@@ -83,28 +104,25 @@ export default function AgencyDashboard() {
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
         <KpiCard 
           title="MRR Previsto (Assinaturas)" 
-          value="R$ 42.850" 
-          trend="+5.2%" 
+          value={`R$ ${billing.mrr.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} 
           icon={<TrendingUp size={24} className="text-gold" />}
         />
         <KpiCard 
           title="Faturamento Extra (Loja)" 
-          value="R$ 3.450" 
+          value={`R$ ${billing.avulsoMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} 
           subtitle="A faturar no próximo ciclo"
           icon={<TrendingUp size={24} className="text-silver-dark" />}
         />
         <KpiCard 
           title="Clientes Ativos" 
-          value="112" 
-          trend="+3" 
+          value={tenants.length.toString()} 
           icon={<Building size={24} className="text-silver-dark" />}
         />
         <KpiCard 
           title="Reuniões Pendentes" 
-          value={notifications.filter(n => n.type === 'REUNIAO').length.toString()} 
-          isWarning={notifications.filter(n => n.type === 'REUNIAO').length > 0}
-          subtitle="Atrasadas no trimestre/semestre"
-          icon={<AlertCircle size={24} className={notifications.filter(n => n.type === 'REUNIAO').length > 0 ? "text-red-500" : "text-silver-dark"} />}
+          value={pendingMeetingsCount.toString()} 
+          isWarning={pendingMeetingsCount > 0}
+          icon={<AlertCircle size={24} className={pendingMeetingsCount > 0 ? "text-red-500" : "text-silver-dark"} />}
         />
       </section>
 
@@ -125,37 +143,29 @@ export default function AgencyDashboard() {
                 <th className="px-6 py-4">Plano</th>
                 <th className="px-6 py-4">Sócios (Uso)</th>
                 <th className="px-6 py-4">Funcionários (Uso)</th>
-                <th className="px-6 py-4">Status Fatura</th>
                 <th className="px-6 py-4 rounded-tr-2xl text-right">Ação</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-onyx/10 dark:divide-white/5">
               
-              <TableRow 
-                name="Tech Startups Ltda" 
-                plan="GESTÃO" 
-                partners="2 / 2" 
-                employees="1 / 3" 
-                status="Em dia"
-              />
-              
-              <TableRow 
-                name="Padaria Central" 
-                plan="START" 
-                partners="2 / 2" 
-                employees="0 / 0" 
-                status="Pendente"
-                isLate
-              />
-              
-              <TableRow 
-                name="Clínica Sorriso" 
-                plan="PRIME" 
-                partners="3 / 3" 
-                employees="6 / 5" 
-                status="A Faturar"
-                warning="Excedente: +1 func. (+R$ 50)"
-              />
+              {tenants.map(tenant => {
+                const planName = tenant.subscription?.plan?.name || 'Sem Plano';
+                return (
+                  <TableRow 
+                    key={tenant.id}
+                    name={tenant.name} 
+                    plan={planName} 
+                    partners={`${tenant._count?.partners || 0}`} 
+                    employees={`${tenant._count?.employees || 0}`} 
+                  />
+                );
+              })}
+
+              {tenants.length === 0 && !loading && (
+                <tr>
+                  <td colSpan={5} className="px-6 py-8 text-center text-silver-dark">Nenhum cliente cadastrado.</td>
+                </tr>
+              )}
               
             </tbody>
           </table>
@@ -237,6 +247,7 @@ function TableRow({ name, plan, partners, employees, status, warning, isLate }: 
         <span className={`text-xs font-bold uppercase px-2 py-1 rounded ${
           plan === 'START' ? 'bg-silver-dark/20 text-silver-dark' : 
           plan === 'GESTÃO' ? 'bg-gold/20 text-gold' : 
+          plan === 'Sem Plano' ? 'bg-red-500/20 text-red-400' :
           'bg-purple-500/20 text-purple-400'
         }`}>{plan}</span>
       </td>
@@ -244,15 +255,6 @@ function TableRow({ name, plan, partners, employees, status, warning, isLate }: 
       <td className="px-6 py-4 flex flex-col gap-1">
         <span className={warning ? "text-gold font-bold" : "text-silver-dark"}>{employees}</span>
         {warning && <span className="text-[9px] text-gold uppercase">{warning}</span>}
-      </td>
-      <td className="px-6 py-4">
-        <span className={`text-xs font-bold flex items-center gap-1 ${
-          isLate ? 'text-red-500' : 
-          status === 'Em dia' ? 'text-green-500' : 'text-silver-dark'
-        }`}>
-          {isLate && <AlertCircle size={12} />}
-          {status}
-        </span>
       </td>
       <td className="px-6 py-4 text-right">
         <button className="text-silver-dark group-hover:text-gold transition-colors">
