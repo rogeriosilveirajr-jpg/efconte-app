@@ -34,7 +34,7 @@ export async function GET() {
 
     return NextResponse.json({
       mrr,
-      avulsoMes: 450, // mock fixo por enquanto para UX
+      avulsoMes: 0, // calculado a partir de invoices no futuro
       inadimplencia,
       invoices
     });

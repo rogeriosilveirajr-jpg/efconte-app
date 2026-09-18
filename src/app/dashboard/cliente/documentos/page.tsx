@@ -43,7 +43,7 @@ export default function DocumentosPage() {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('tenantId', 'tech-contabilidade-123'); // Usando um tenantId mockado para o MVP
+      // O tenantId será obtido na API através da sessão do usuário
       
       const res = await fetch('/api/documents/upload', {
         method: 'POST',
