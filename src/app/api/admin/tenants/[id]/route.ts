@@ -60,3 +60,19 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     return NextResponse.json({ error: 'Erro ao processar' }, { status: 500 });
   }
 }
+
+export async function DELETE(request: Request, context: { params: Promise<{ id: string }> }) {
+  const params = await context.params;
+  const { id } = params;
+
+  try {
+    await prisma.tenant.update({
+      where: { id },
+      data: { isDeleted: true }
+    });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: 'Erro ao excluir cliente' }, { status: 500 });
+  }
+}

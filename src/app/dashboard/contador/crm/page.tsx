@@ -64,6 +64,7 @@ export default function CrmPage() {
     { id: 'PROPOSAL', label: 'Proposta', color: 'border-purple-500', bg: 'bg-purple-50 dark:bg-purple-900/20', text: 'text-purple-700 dark:text-purple-400' },
     { id: 'WON', label: 'Ganho', color: 'border-green-500', bg: 'bg-green-50 dark:bg-green-900/20', text: 'text-green-700 dark:text-green-400' },
     { id: 'LOST', label: 'Perdido', color: 'border-red-500', bg: 'bg-red-50 dark:bg-red-900/20', text: 'text-red-700 dark:text-red-400' },
+    { id: 'INACTIVE', label: 'Inativos', color: 'border-gray-500', bg: 'bg-gray-50 dark:bg-gray-900/20', text: 'text-gray-700 dark:text-gray-400' },
   ];
 
   return (
