@@ -10,7 +10,7 @@ export const revalidate = 3600; // revalidate at most every hour
 
 export default async function Home() {
   
-  let dbPlans = [];
+  let dbPlans: any[] = [];
   try {
     dbPlans = await prisma.plan.findMany({ orderBy: { basePrice: 'asc' } });
   } catch (e) {
