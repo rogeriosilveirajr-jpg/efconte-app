@@ -16,33 +16,30 @@
 }
 
 :root {
-  /* Applying CodeLumen Design System */
-  --color-primary: #032642; /* Deep Blue CodeLumen */
-  --color-background: #032642; /* Deep Blue */
-  --color-surface: rgba(255, 255, 255, 0.03); /* Glass */
-  --color-text: #f3f4f6; /* Light gray text */
-  --color-border: rgba(255, 255, 255, 0.05); /* subtle border */
+  /* Light theme variables */
+  --color-primary: #0a3b6f; 
+  --color-background: #fffbf5; /* Original EFConte Light Background */
+  --color-surface: rgba(255, 255, 255, 0.7); /* Translucent surface for glass effect */
+  --color-text: #2d2620; 
+  --color-border: rgba(61, 53, 48, 0.1); /* Subtle dark border for light mode */
+  --color-accent: var(--brand-gold);
   
-  /* Replacing Gold with Cyan */
-  --brand-gold: #00E5FF; /* Cyan */
-  --brand-gold-hover: #00b3cc;
-  
-  /* Retaining some silver tones for neutral text */
-  --brand-silver: #9ca3af;
-  --brand-silver-dark: #6b7280;
-  --brand-onyx: #111827;
-  
-  color-scheme: dark;
+  /* Preserve original EFConte brand colors */
+  --brand-gold: #c9a96e;
+  --brand-gold-hover: #b39558;
+  --brand-silver: #7a6f67;
+  --brand-silver-dark: #5a5550;
+  --brand-onyx: #3d3530;
 }
 
-/* Dark theme overrides (same as root since CodeLumen is inherently dark) */
+/* Dark theme overrides */
 .dark {
-  --color-primary: #032642;
-  --color-background: #032642;
-  --color-surface: rgba(255, 255, 255, 0.03);
-  --color-text: #f3f4f6;
-  --color-border: rgba(255, 255, 255, 0.05);
-  --brand-gold: #00E5FF;
+  --color-primary: #0a3b6f;
+  --color-background: #000000; /* Original EFConte Dark Background */
+  --color-surface: rgba(255, 255, 255, 0.03); /* Deep Glass Surface */
+  --color-text: #f3f4f6; /* Light text for readability */
+  --color-border: rgba(255, 255, 255, 0.05); /* Subtle light border for dark mode */
+  --color-accent: var(--brand-gold);
 }
 
 body {
@@ -52,31 +49,42 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Glassmorphism Premium (CodeLumen feel) */
+/* Glassmorphism Premium with Depth (CodeLumen feel, but EFConte colors) */
 .glass-panel {
   background: var(--color-surface);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--color-border);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  /* Deep shadow for the 'floating/depth' effect */
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.25);
+}
+
+.dark .glass-panel {
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.6); /* Stronger shadow in dark mode */
 }
 
 /* Utility for smooth theme changes */
 .theme-transition {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Plan Cards with Cyan glow */
+/* Plan Cards with Gold Glow Depth */
 .plan-card {
   transition: all 0.3s ease;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-text);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+}
+
+.dark .plan-card {
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 }
 
 .plan-card:has(button:hover), .plan-card:hover {
   border-color: var(--brand-gold);
-  box-shadow: 0 0 20px rgba(0, 229, 255, 0.15);
+  /* EFConte Gold Glow */
+  box-shadow: 0 0 25px rgba(201, 169, 110, 0.25);
   transform: translateY(-4px);
 }
 
