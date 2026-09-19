@@ -3,7 +3,7 @@ import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { Mail, Phone, Instagram, CheckCircle2, Star, ShieldCheck, Briefcase, TrendingUp, Users, Lock } from "lucide-react";
+import { Mail, Phone, CheckCircle2, Star, ShieldCheck, Briefcase, TrendingUp, Users, Lock } from "lucide-react";
 import prisma from "@/lib/prisma";
 
 export const revalidate = 3600; // revalidate at most every hour
@@ -197,6 +197,80 @@ export default async function Home() {
           </div>
         </section>
 
+        
+        {/* NOTÍCIAS SECTION (G1 Style) */}
+        <section id="noticias" className="w-full max-w-6xl py-24 border-t border-onyx/10 dark:border-white/10 flex flex-col items-center">
+          <div className="mb-12 flex flex-col items-center text-center w-full">
+            <h2 className="text-sm font-bold text-gold uppercase tracking-widest mb-2">Fique Atualizado</h2>
+            <h3 className="text-3xl md:text-5xl font-bold">Portal de Notícias</h3>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full">
+            
+            {/* Destaque Principal (Left side) */}
+            <div className="lg:col-span-7 flex flex-col justify-center p-6 bg-surface border border-onyx/10 dark:border-white/10 rounded-2xl hover:shadow-lg transition-shadow cursor-pointer">
+              <div className="mb-4">
+                <span className="text-xs font-bold text-silver-dark uppercase tracking-wider">Imposto de Renda 2026</span>
+              </div>
+              <h1 className="text-3xl md:text-4xl font-black text-gold mb-6 leading-tight hover:underline decoration-gold">
+                Receita Federal anuncia novas regras e limites de isenção para micro e pequenas empresas; veja o que muda
+              </h1>
+              <ul className="flex flex-col gap-3 text-silver-dark font-medium list-disc list-inside">
+                <li>MEI terá novos limites de faturamento anual a partir de maio.</li>
+                <li>Declaração pré-preenchida será obrigatória para optantes pelo Simples.</li>
+                <li>Saiba como o seu escritório pode se preparar antecipadamente.</li>
+              </ul>
+            </div>
+
+            {/* Destaques Menores com Imagem (Right side) */}
+            <div className="lg:col-span-5 flex flex-col gap-6">
+              
+              {/* Card 1 */}
+              <div className="relative h-64 rounded-2xl overflow-hidden group cursor-pointer shadow-md">
+                {/* Imagem de Fundo */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                  style={{ backgroundImage: "url('https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&q=80')" }}
+                ></div>
+                {/* Gradiente Escuro Embaixo */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+                {/* Top Tag */}
+                <div className="absolute top-4 left-4 flex items-center gap-2">
+                  <span className="bg-gold text-onyx text-[10px] font-bold uppercase px-2 py-1 rounded">Gestão</span>
+                </div>
+                {/* Texto */}
+                <div className="absolute bottom-0 left-0 w-full p-6">
+                  <h3 className="text-white text-xl font-bold leading-snug group-hover:text-gold transition-colors">
+                    Reforma Tributária: como o novo IVA afeta prestadores de serviço
+                  </h3>
+                </div>
+              </div>
+
+              {/* Card 2 */}
+              <div className="relative h-64 rounded-2xl overflow-hidden group cursor-pointer shadow-md">
+                {/* Imagem de Fundo */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                  style={{ backgroundImage: "url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&q=80')" }}
+                ></div>
+                {/* Gradiente Escuro Embaixo */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+                {/* Top Tag */}
+                <div className="absolute top-4 left-4 flex items-center gap-2">
+                  <span className="bg-blue-500 text-white text-[10px] font-bold uppercase px-2 py-1 rounded">Tecnologia</span>
+                </div>
+                {/* Texto */}
+                <div className="absolute bottom-0 left-0 w-full p-6">
+                  <h3 className="text-white text-xl font-bold leading-snug group-hover:text-gold transition-colors">
+                    Digitalização de documentos fiscais passa a ser obrigatória em 10 estados
+                  </h3>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
         {/* SOBRE NÓS SECTION - SMALLER */}
         <section id="sobre" className="w-full max-w-4xl py-24 border-t border-onyx/10 dark:border-white/10 flex flex-col md:flex-row gap-12 items-center justify-center">
           {/* Imagem Eduardo (Menor) */}
@@ -252,7 +326,7 @@ export default async function Home() {
 
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-gold/10 rounded-full flex items-center justify-center text-gold">
-                  <Instagram size={18} />
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
                 </div>
                 <div className="flex flex-col text-left">
                   <span className="text-[10px] text-silver-dark font-bold uppercase tracking-wider">Instagram</span>

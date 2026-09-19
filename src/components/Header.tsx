@@ -56,6 +56,7 @@ export default function Header() {
           <nav className="hidden md:flex items-center gap-8 text-sm font-bold text-silver-dark">
             <button onClick={() => scrollTo('servicos')} className="hover:text-gold transition-colors">Serviços</button>
             <button onClick={() => scrollTo('diferenciais')} className="hover:text-gold transition-colors">Diferenciais</button>
+            <button onClick={() => scrollTo('noticias')} className="hover:text-gold transition-colors">Notícias</button>
             <button onClick={() => scrollTo('sobre')} className="hover:text-gold transition-colors">Sobre Nós</button>
           </nav>
 
