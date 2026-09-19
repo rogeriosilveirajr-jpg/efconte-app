@@ -273,12 +273,12 @@ export default async function Home() {
 
         {/* SOBRE NÓS SECTION - SMALLER */}
         <section id="sobre" className="w-full max-w-4xl py-24 border-t border-onyx/10 dark:border-white/10 flex flex-col md:flex-row gap-12 items-center justify-center">
-          {/* Imagem Eduardo (Menor) */}
+          {/* Imagem Eugenio (Menor) */}
           <div className="w-full md:w-1/3 flex justify-center">
             <div className="relative w-48 h-48 sm:w-56 sm:h-56 rounded-full overflow-hidden border-4 border-gold shadow-[0_0_30px_rgba(201,169,110,0.2)]">
               <Image 
-                src="/eduardo-efconte.jpg" 
-                alt="Eduardo Fernandes - EFCONTE" 
+                src="/eugenio-efconte.jpg" 
+                alt="Eugenio Francisco Conte - EFCONTE" 
                 fill
                 className="object-cover"
               />
@@ -289,7 +289,7 @@ export default async function Home() {
           <div className="w-full md:w-2/3 flex flex-col gap-4 text-center md:text-left">
             <div>
               <h2 className="text-xs font-bold text-gold uppercase tracking-widest mb-1">Sobre Nós</h2>
-              <h3 className="text-2xl md:text-3xl font-bold">Eduardo Fernandes</h3>
+              <h3 className="text-2xl md:text-3xl font-bold">Eugenio Francisco Conte</h3>
               <p className="text-sm font-bold text-silver mt-1">Contador Responsável • CRC SC-048010/O-5</p>
             </div>
             
