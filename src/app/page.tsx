@@ -3,7 +3,7 @@ import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { Mail, Phone, CheckCircle2, Star, ShieldCheck, Briefcase, TrendingUp, Users, Lock } from "lucide-react";
+import { Mail, Phone, Instagram, CheckCircle2, Star, ShieldCheck, Briefcase, TrendingUp, Users, Lock } from "lucide-react";
 import prisma from "@/lib/prisma";
 
 export const revalidate = 3600; // revalidate at most every hour
@@ -215,7 +215,8 @@ export default async function Home() {
           <div className="w-full md:w-2/3 flex flex-col gap-4 text-center md:text-left">
             <div>
               <h2 className="text-xs font-bold text-gold uppercase tracking-widest mb-1">Sobre Nós</h2>
-              <h3 className="text-2xl md:text-3xl font-bold">Experiência e Confiança</h3>
+              <h3 className="text-2xl md:text-3xl font-bold">Eduardo Fernandes</h3>
+              <p className="text-sm font-bold text-silver mt-1">Contador Responsável • CRC SC-048010/O-5</p>
             </div>
             
             <div className="text-silver-dark space-y-3 text-sm md:text-base leading-relaxed">
@@ -246,6 +247,16 @@ export default async function Home() {
                 <div className="flex flex-col text-left">
                   <span className="text-[10px] text-silver-dark font-bold uppercase tracking-wider">E-mail</span>
                   <a href="mailto:efconteassessoriacontabil@gmail.com" className="font-bold text-sm hover:text-gold transition-colors">efconteassessoriacontabil@gmail.com</a>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gold/10 rounded-full flex items-center justify-center text-gold">
+                  <Instagram size={18} />
+                </div>
+                <div className="flex flex-col text-left">
+                  <span className="text-[10px] text-silver-dark font-bold uppercase tracking-wider">Instagram</span>
+                  <a href="https://www.instagram.com/efconte.contabilidade" target="_blank" className="font-bold text-sm hover:text-gold transition-colors">@efconte.contabilidade</a>
                 </div>
               </div>
             </div>
