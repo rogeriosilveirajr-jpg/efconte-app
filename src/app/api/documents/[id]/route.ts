@@ -3,15 +3,17 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
+    const resolvedParams = await params;
+
     const doc = await prisma.document.findUnique({
-      where: { id: params.id }
+      where: { id: resolvedParams.id }
     });
 
     if (!doc) {
@@ -31,7 +33,6 @@ export async function GET(request: Request, { params }: { params: { id: string }
     }
 
     if (!doc.fileData) {
-      // If it has no fileData, maybe it's an old Firebase URL
       if (doc.fileUrl && doc.fileUrl.startsWith('http')) {
         return NextResponse.redirect(doc.fileUrl);
       }
@@ -42,7 +43,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
     
     return new NextResponse(buffer, {
       headers: {
-        'Content-Type': 'application/pdf', // Or dynamically check extension from title
+        'Content-Type': 'application/pdf', 
         'Content-Disposition': `inline; filename="${doc.title}"`
       }
     });
