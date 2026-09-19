@@ -16,29 +16,33 @@
 }
 
 :root {
-  /* Light theme variables */
-  --color-primary: #0a3b6f; /* brand primary color */
-  --color-background: #fffbf5; /* existing background */
-  --color-surface: #ffffff; /* panels, cards */
-  --color-text: #2d2620; /* existing foreground */
-  --color-border: #e0e0e0; /* light border */
-  --color-accent: var(--brand-gold); /* gold accent */
-  /* Preserve brand colors */
-  --brand-gold: #c9a96e;
-  --brand-gold-hover: #b39558;
-  --brand-silver: #7a6f67;
-  --brand-silver-dark: #5a5550;
-  --brand-onyx: #3d3530;
+  /* Applying CodeLumen Design System */
+  --color-primary: #032642; /* Deep Blue CodeLumen */
+  --color-background: #032642; /* Deep Blue */
+  --color-surface: rgba(255, 255, 255, 0.03); /* Glass */
+  --color-text: #f3f4f6; /* Light gray text */
+  --color-border: rgba(255, 255, 255, 0.05); /* subtle border */
+  
+  /* Replacing Gold with Cyan */
+  --brand-gold: #00E5FF; /* Cyan */
+  --brand-gold-hover: #00b3cc;
+  
+  /* Retaining some silver tones for neutral text */
+  --brand-silver: #9ca3af;
+  --brand-silver-dark: #6b7280;
+  --brand-onyx: #111827;
+  
+  color-scheme: dark;
 }
 
-/* Dark theme overrides */
+/* Dark theme overrides (same as root since CodeLumen is inherently dark) */
 .dark {
-  --color-primary: #0a3b6f;
-  --color-background: #000000;
-  --color-surface: #1e1e1e;
-  --color-text: var(--brand-gold);
-  --color-border: #333333;
-  --color-accent: var(--brand-gold);
+  --color-primary: #032642;
+  --color-background: #032642;
+  --color-surface: rgba(255, 255, 255, 0.03);
+  --color-text: #f3f4f6;
+  --color-border: rgba(255, 255, 255, 0.05);
+  --brand-gold: #00E5FF;
 }
 
 body {
@@ -48,12 +52,13 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Glassmorphism Premium */
+/* Glassmorphism Premium (CodeLumen feel) */
 .glass-panel {
   background: var(--color-surface);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--color-border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
 }
 
 /* Utility for smooth theme changes */
@@ -61,19 +66,17 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
-
-/* CSS Nesting & :has() para os cards de plano */
+/* Plan Cards with Cyan glow */
 .plan-card {
   transition: all 0.3s ease;
-  border: 2px solid var(--brand-gold);
-  background: #ffffff;
-  color: var(--foreground);
-  box-shadow: 0 2px 8px rgba(45, 38, 32, 0.08);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
 }
 
 .plan-card:has(button:hover), .plan-card:hover {
   border-color: var(--brand-gold);
-  box-shadow: 0 8px 24px rgba(201, 169, 110, 0.2);
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.15);
   transform: translateY(-4px);
 }
 

@@ -23,3 +23,37 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: 'Erro ao atualizar perfil' }, { status: 500 });
   }
 }
+
+export async function GET(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email as string },
+      include: {
+        tenants: {
+          include: {
+            tenant: {
+              include: {
+                subscription: {
+                  include: { plan: true }
+                },
+                _count: {
+                  select: { employees: true, partners: true }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+
+    return NextResponse.json({ user });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error: 'Erro ao buscar perfil' }, { status: 500 });
+  }
+}
