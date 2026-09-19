@@ -1,5 +1,6 @@
 import { Mail, Phone, MapPin } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -13,15 +14,18 @@ export default function Footer() {
         
         {/* Sobre a Empresa */}
         <div className="flex items-start gap-6">
-          <img
-            src="https://via.placeholder.com/150"
-            alt="Contador Mock"
-            className="w-36 h-36 rounded-full border-2 border-gold object-cover aspect-square"
-          />
+          <div className="relative w-24 h-24 sm:w-36 sm:h-36 rounded-full overflow-hidden border-2 border-gold flex-shrink-0 shadow-[0_0_15px_rgba(201,169,110,0.2)]">
+            <Image
+              src="/eduardo-efconte.jpg"
+              alt="Eduardo Fernandes"
+              fill
+              className="object-cover"
+            />
+          </div>
           <div className="flex flex-col gap-2">
             <h3 className="text-xl font-bold text-gold uppercase tracking-wide">Sobre Nós</h3>
             <p className="text-sm leading-relaxed text-silver">
-              A EFCONTE é uma assessoria contábil especializada em pequenos e médios negócios. Oferecemos soluções estratégicas para manter sua empresa em dia e seus números sob controle.
+              Contabilidade próxima, clara e responsável, adaptada à realidade de cada cliente. 8 anos de experiência cuidando dos seus números e guiando decisões.
             </p>
           </div>
         </div>
@@ -33,15 +37,15 @@ export default function Footer() {
           </h3>
           <div className="flex items-center gap-3 text-sm hover:text-gold transition-colors cursor-pointer">
             <Phone size={18} className="text-gold flex-shrink-0" />
-            <span>(11) 9999-9999</span>
+            <a href="https://wa.me/5547992187868" target="_blank">(47) 99218-7868</a>
           </div>
-          <div className="flex items-center gap-3 text-sm hover:text-gold transition-colors cursor-pointer">
+          <div className="flex items-center gap-3 text-sm hover:text-gold transition-colors cursor-pointer break-all">
             <Mail size={18} className="text-gold flex-shrink-0" />
-            <span>contato@efconte.com.br</span>
+            <a href="mailto:efconteassessoriacontabil@gmail.com">Efconteassessoriacontabil@gmail.com</a>
           </div>
           <div className="flex items-start gap-3 text-sm">
             <MapPin size={18} className="text-gold mt-1 flex-shrink-0" />
-            <span>São Paulo, SP<br />Brasil</span>
+            <span>Joinville, SC<br />Brasil</span>
           </div>
         </div>
 
@@ -51,10 +55,10 @@ export default function Footer() {
             Profissional
           </h3>
           <div className="text-sm">
-            <p className="font-semibold text-silver mb-1">Rogerio Silva</p>
-            <p className="text-silver-dark">Contador | CRC 1234567</p>
+            <p className="font-semibold text-silver mb-1">Eduardo Fernandes</p>
+            <p className="text-silver-dark">Contador Responsável</p>
             <p className="text-silver-dark mt-2">
-              Especialista em gestão contábil e tributária para micro e pequenas empresas.
+              Graduado em Ciências Contábeis pela Univille. Especialista em gestão contábil e apoio estratégico a negócios.
             </p>
           </div>
         </div>
@@ -69,14 +73,8 @@ export default function Footer() {
       {/* Copyright */}
       <div className="text-center text-sm text-silver-dark">
         <p>&copy; {currentYear} EFCONTE Assessoria Contábil. Todos os direitos reservados.</p>
-        <p className="mt-2">
-          <Link href="#" className="hover:text-gold transition-colors">
-            Política de Privacidade
-          </Link>
-          {" • "}
-          <Link href="#" className="hover:text-gold transition-colors">
-            Termos de Uso
-          </Link>
+        <p className="mt-2 text-xs">
+          Powered by <a href="#" className="font-bold text-gold hover:underline">CodeLumen | Technology Agency</a>
         </p>
       </div>
     </footer>

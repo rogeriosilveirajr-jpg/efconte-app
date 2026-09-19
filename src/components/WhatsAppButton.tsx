@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 export default function WhatsAppButton() {
-  const whatsappNumber = "5511999999999"; // Número do WhatsApp (sem formatação)
+  const whatsappNumber = "5547992187868"; // Número do WhatsApp (sem formatação)
   const whatsappMessage = "Olá! Gostaria de saber mais sobre os serviços da EFCONTE.";
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
 
