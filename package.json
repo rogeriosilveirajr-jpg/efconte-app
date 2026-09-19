@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
+    "@types/react-signature-canvas": "^1.0.7",
     "bcryptjs": "^3.0.3",
     "firebase": "^12.19.0",
     "lucide-react": "^1.31.0",
@@ -18,7 +19,8 @@
     "next-auth": "^4.24.15",
     "nodemailer": "^7.0.13",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "react-signature-canvas": "^1.1.0-alpha.2"
   },
   "devDependencies": {
     "@jest/types": "^30.5.1",

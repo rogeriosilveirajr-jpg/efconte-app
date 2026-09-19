@@ -33,6 +33,7 @@ export default function ClientDashboardLayout({
             <NavItem href="/dashboard/cliente" icon={<LayoutDashboard size={20} />} label="Visão Geral" active />
             <NavItem href="/dashboard/cliente/loja" icon={<Store size={20} />} label="Loja de Serviços" />
             <NavItem href="/dashboard/cliente/documentos" icon={<FileText size={20} />} label="Documentos" />
+            <NavItem href="/dashboard/cliente/contratos" icon={<FileText size={20} />} label="Contratos" />
             <NavItem href="/dashboard/cliente/dp" icon={<Users size={20} />} label="Departamento Pessoal" />
             <NavItem href="/dashboard/cliente/faturas" icon={<CreditCard size={20} />} label="Faturas" />
           </nav>

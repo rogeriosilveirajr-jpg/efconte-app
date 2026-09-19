@@ -285,14 +285,39 @@ function DocumentosTab({ tenant }: { tenant: any }) {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      
+      const type = window.prompt("Qual é o tipo deste documento?\n(Ex: CONTRATO, IMPOSTO, DP, OUTROS)", "CONTRATO");
+      if (!type) return;
+
       setUploading(true);
-      const name = e.target.files[0].name;
-      setTimeout(() => {
-        setSentFiles(prev => [name, ...prev]);
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('tenantId', tenant.id);
+      formData.append('type', type.toUpperCase());
+
+      try {
+        const res = await fetch('/api/documents/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setSentFiles(prev => [file.name, ...prev]);
+          alert('Documento enviado com sucesso!');
+        } else {
+          alert('Erro ao enviar o documento.');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao fazer upload.');
+      } finally {
         setUploading(false);
-      }, 1500);
+      }
     }
   };
 

@@ -64,12 +64,14 @@ export async function POST(request: Request) {
     const downloadToken = data.downloadTokens;
     const fileUrl = `https://firebasestorage.googleapis.com/v0/b/efconte-app.appspot.com/o/${filePath}?alt=media&token=${downloadToken}`;
 
+    const docType = (formData.get('type') as string) || 'OUTROS';
     const doc = await prisma.document.create({
       data: {
         tenantId,
         title: file.name,
         fileUrl,
-        type: 'OUTROS'
+        type: docType,
+        status: docType === 'CONTRATO' ? 'PENDING' : null
       }
     });
 

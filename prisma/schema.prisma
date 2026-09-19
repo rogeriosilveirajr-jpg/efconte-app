@@ -137,13 +137,16 @@ model Meeting {
 
 // Documentos
 model Document {
-  id        String   @id @default(uuid())
-  tenantId  String
-  title     String
-  fileUrl   String
-  type      String   @default("OUTROS")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String    @id @default(uuid())
+  tenantId     String
+  title        String
+  fileUrl      String
+  type         String    @default("OUTROS") // CONTRATO, IMPOSTO, DP, OUTROS
+  status       String?   // PENDING, SIGNED (usado para contratos)
+  signatureUrl String?   // URL da imagem da assinatura
+  signedAt     DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  tenant       Tenant    @relation(fields: [tenantId], references: [id])
 }
