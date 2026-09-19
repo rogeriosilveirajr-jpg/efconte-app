@@ -14,11 +14,12 @@ export async function POST(request: Request) {
     const file = formData.get('file') as File;
     let tenantId = formData.get('tenantId') as string;
 
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email as string },
+      include: { tenants: true }
+    });
+
     if (!tenantId) {
-      const user = await prisma.user.findUnique({
-        where: { email: session.user.email as string },
-        include: { tenants: true }
-      });
       if (user && user.tenants.length > 0) {
         tenantId = user.tenants[0].tenantId;
       }
@@ -28,14 +29,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Faltam dados' }, { status: 400 });
     }
 
-    const bucket = "efconte-app.firebasestorage.app"; // ou appspot.com se for o padrão
+    // VERIFICAÇÃO DE SEGURANÇA CONTRA HACKERS (IDOR)
+    if (session.user.role !== 'ADMIN') {
+      const belongsToTenant = user?.tenants.some(t => t.tenantId === tenantId);
+      if (!belongsToTenant) {
+        return NextResponse.json({ error: 'Acesso negado. Tentativa de upload em empresa de terceiros bloqueada.' }, { status: 403 });
+      }
+    }
+
+    const bucket = "efconte-app.firebasestorage.app";
     const cleanBucketName = bucket.replace('.firebasestorage.app', '.appspot.com'); 
-    // O storage do Firebase costuma ser projectId.appspot.com
 
     const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
     const filePath = encodeURIComponent(`documents/${tenantId}/${fileName}`);
     
-    // Upload via REST API (evita problemas de CORS no cliente e não precisa do SDK admin)
     const url = `https://firebasestorage.googleapis.com/v0/b/efconte-app.appspot.com/o?name=${filePath}`;
     
     const response = await fetch(url, {
@@ -54,7 +61,6 @@ export async function POST(request: Request) {
 
     const data = await response.json();
     
-    // Constrói a URL pública baseada na resposta (usando o downloadTokens se houver, ou URL padrão)
     const downloadToken = data.downloadTokens;
     const fileUrl = `https://firebasestorage.googleapis.com/v0/b/efconte-app.appspot.com/o/${filePath}?alt=media&token=${downloadToken}`;
 

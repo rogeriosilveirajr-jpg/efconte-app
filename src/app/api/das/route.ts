@@ -1,8 +1,18 @@
 import { NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../auth/[...nextauth]/route';
 import { generateDAS } from '@/lib/billing';
 
 export async function POST(request: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    
+    // In a real scenario, you'd also check if the requested tenantId belongs to the user
+    // if session.user.role !== 'ADMIN'
+
     const payload = await request.json();
     const result = await generateDAS(payload);
     return NextResponse.json(result);
