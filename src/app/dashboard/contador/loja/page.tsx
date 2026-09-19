@@ -7,6 +7,7 @@ import { Eye, Settings, Save, CheckCircle2, Info } from "lucide-react";
 export default function ContadorStorePage() {
   const [activeTab, setActiveTab] = useState("preview");
   const [plans, setPlans] = useState<any[]>([]);
+  const [settings, setSettings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -18,8 +19,11 @@ export default function ContadorStorePage() {
   const fetchPlans = async () => {
     try {
       const res = await fetch('/api/admin/plans');
+      const sRes = await fetch('/api/admin/settings');
       const data = await res.json();
       setPlans(data.plans || []);
+      const sData = await sRes.json();
+      setSettings(sData.settings || []);
     } catch (e) {
       console.error(e);
     } finally {
@@ -37,6 +41,22 @@ export default function ContadorStorePage() {
     setPlans(newPlans);
   };
 
+  const handleSettingChange = (key: string, value: string) => {
+    const newSettings = [...settings];
+    const idx = newSettings.findIndex(s => s.key === key);
+    if (idx >= 0) {
+      newSettings[idx].value = value;
+    } else {
+      newSettings.push({ key, value });
+    }
+    setSettings(newSettings);
+  };
+
+  const getSetting = (key: string) => {
+    const s = settings.find(s => s.key === key);
+    return s ? s.value : '';
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -47,6 +67,11 @@ export default function ContadorStorePage() {
           body: JSON.stringify({ id: p.id, name: p.name, basePrice: p.basePrice })
         });
       }
+      await fetch('/api/admin/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ settings })
+      });
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (e) {
@@ -144,6 +169,40 @@ export default function ContadorStorePage() {
               </div>
             )}
             
+            
+            {/* Tabela de Serviços Extras */}
+            <div className="mt-8 bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-[#333333] rounded-xl overflow-hidden shadow-sm">
+                <div className="p-4 bg-gray-50 dark:bg-[#1a1a1a] border-b border-gray-200 dark:border-[#333333]">
+                  <h4 className="font-bold">Serviços Avulsos e Excedentes (R$)</h4>
+                </div>
+                <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-bold text-gray-500">Admissão</label>
+                    <input type="number" value={getSetting('price_admissao')} onChange={(e) => handleSettingChange('price_admissao', e.target.value)} className="w-full bg-white dark:bg-[#111] border border-gray-300 dark:border-[#444] rounded-md px-3 py-2 text-gray-900 dark:text-white" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-bold text-gray-500">Rescisão</label>
+                    <input type="number" value={getSetting('price_rescisao')} onChange={(e) => handleSettingChange('price_rescisao', e.target.value)} className="w-full bg-white dark:bg-[#111] border border-gray-300 dark:border-[#444] rounded-md px-3 py-2 text-gray-900 dark:text-white" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-bold text-gray-500">Folha Extra</label>
+                    <input type="number" value={getSetting('price_folha_extra')} onChange={(e) => handleSettingChange('price_folha_extra', e.target.value)} className="w-full bg-white dark:bg-[#111] border border-gray-300 dark:border-[#444] rounded-md px-3 py-2 text-gray-900 dark:text-white" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-bold text-gray-500">Funcionário Extra</label>
+                    <input type="number" value={getSetting('price_func_extra')} onChange={(e) => handleSettingChange('price_func_extra', e.target.value)} className="w-full bg-white dark:bg-[#111] border border-gray-300 dark:border-[#444] rounded-md px-3 py-2 text-gray-900 dark:text-white" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-bold text-gray-500">Sócio Extra</label>
+                    <input type="number" value={getSetting('price_socio_extra')} onChange={(e) => handleSettingChange('price_socio_extra', e.target.value)} className="w-full bg-white dark:bg-[#111] border border-gray-300 dark:border-[#444] rounded-md px-3 py-2 text-gray-900 dark:text-white" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs font-bold text-gray-500">Setup</label>
+                    <input type="number" value={getSetting('price_setup')} onChange={(e) => handleSettingChange('price_setup', e.target.value)} className="w-full bg-white dark:bg-[#111] border border-gray-300 dark:border-[#444] rounded-md px-3 py-2 text-gray-900 dark:text-white" />
+                  </div>
+                </div>
+            </div>
+  
             <div className="mt-8 bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-900/30 rounded-lg p-4 flex gap-3 text-blue-800 dark:text-blue-300 text-sm">
               <Info className="shrink-0 mt-0.5" size={18} />
               <p>Os benefícios de cada plano (recursos e limites) continuam sendo gerenciados internamente pela plataforma para garantir a estabilidade do contrato. Apenas os Nomes e Preços de Prateleira são ajustados aqui.</p>

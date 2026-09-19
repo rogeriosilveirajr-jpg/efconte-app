@@ -151,3 +151,8 @@ model Document {
 
   tenant       Tenant    @relation(fields: [tenantId], references: [id])
 }
+
+model Setting {
+  key   String @id
+  value String
+}

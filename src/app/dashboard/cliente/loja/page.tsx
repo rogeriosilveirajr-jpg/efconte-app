@@ -78,11 +78,21 @@ const AVULSO_SERVICES = [
 export default function StorePage() {
   const [plans, setPlans] = useState<Plan[]>(BASE_PLANS);
   const [loadingPlans, setLoadingPlans] = useState(true);
+  const [settings, setSettings] = useState<any>({});
 
+  
   useEffect(() => {
-    fetch('/api/admin/plans')
-      .then(res => res.json())
-      .then(data => {
+    Promise.all([fetch('/api/admin/plans'), fetch('/api/admin/settings')])
+      .then(async ([resPlans, resSettings]) => {
+        const data = await resPlans.json();
+        const settingsData = await resSettings.json();
+        
+        if (settingsData.settings) {
+          const sMap: any = {};
+          settingsData.settings.forEach((s: any) => sMap[s.key] = s.value);
+          setSettings(sMap);
+        }
+
         if (data.plans) {
           const dynamicPlans = BASE_PLANS.map(base => {
             const dbPlan = data.plans.find((p: any) => p.name.toUpperCase() === base.name.toUpperCase());
@@ -96,6 +106,7 @@ export default function StorePage() {
       })
       .finally(() => setLoadingPlans(false));
   }, []);
+
 
   const handleUpgradeClick = (planName: string) => {
     alert(`Obrigado pelo interesse no plano ${planName}! Nossa equipe entrará em contato em breve para realizar o upgrade da sua conta e tirar suas dúvidas.`);
@@ -217,7 +228,7 @@ export default function StorePage() {
               </div>
               <div className="mt-auto flex items-end justify-between border-t border-onyx/10 dark:border-white/5 pt-4">
                 <span className="text-[10px] uppercase font-bold text-silver-dark tracking-wider">Custo</span>
-                <span className="font-bold text-lg">R$ {service.price.toFixed(2).replace('.', ',')}</span>
+                <span className="font-bold text-lg">R$ {parseFloat(settings[service.title === "Admissão de Funcionário" ? "price_admissao" : service.title === "Rescisão Contratual" ? "price_rescisao" : "price_folha_extra"] || service.price).toFixed(2).replace('.', ',')}</span>
               </div>
             </div>
           ))}
@@ -231,19 +242,19 @@ export default function StorePage() {
           <div className="p-4 flex flex-col sm:flex-row gap-8 justify-around text-center">
             <div className="flex flex-col gap-1">
               <span className="text-sm font-bold">Funcionário Extra</span>
-              <span className="text-gold font-bold">R$ 50,00 /mês</span>
+              <span className="text-gold font-bold">R$ {settings['price_func_extra'] || '50'} /mês</span>
               <span className="text-xs text-silver-dark">Até atingir limite do próximo plano</span>
             </div>
             <div className="hidden sm:block w-px bg-onyx/10 dark:bg-white/10"></div>
             <div className="flex flex-col gap-1">
               <span className="text-sm font-bold">Sócio Extra</span>
-              <span className="text-gold font-bold">R$ 40,00 /mês</span>
+              <span className="text-gold font-bold">R$ {settings['price_socio_extra'] || '40'} /mês</span>
               <span className="text-xs text-silver-dark">Faturado recorrentemente</span>
             </div>
             <div className="hidden sm:block w-px bg-onyx/10 dark:bg-white/10"></div>
             <div className="flex flex-col gap-1">
               <span className="text-sm font-bold">Taxa de Setup</span>
-              <span className="text-gold font-bold">R$ 250,00</span>
+              <span className="text-gold font-bold">R$ {settings['price_setup'] || '250'}</span>
               <span className="text-xs text-silver-dark">Apenas p/ contratos não-anuais</span>
             </div>
           </div>
