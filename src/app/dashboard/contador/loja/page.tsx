@@ -30,7 +30,7 @@ export default function ContadorStorePage() {
   const handlePlanChange = (index: number, field: string, value: string) => {
     const newPlans = [...plans];
     if (field === 'basePrice') {
-      newPlans[index][field] = parseFloat(value) || 0;
+      newPlans[index][field] = value === '' ? '' : (parseFloat(value) || 0);
     } else {
       newPlans[index][field] = value;
     }

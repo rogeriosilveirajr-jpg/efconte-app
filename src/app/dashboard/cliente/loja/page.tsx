@@ -85,7 +85,7 @@ export default function StorePage() {
       .then(data => {
         if (data.plans) {
           const dynamicPlans = BASE_PLANS.map(base => {
-            const dbPlan = data.plans.find((p: any) => p.id === base.id);
+            const dbPlan = data.plans.find((p: any) => p.name.toUpperCase() === base.name.toUpperCase());
             if (dbPlan) {
               return { ...base, name: dbPlan.name, price: dbPlan.basePrice };
             }
