@@ -60,11 +60,11 @@ export default function AutomacaoFiscalPage() {
           <button 
             disabled={syncStatus.nfe !== 'idle'}
             onClick={() => simulateSync('nfe')}
-            className={\`w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all \${
+            className={`w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
               syncStatus.nfe === 'done' ? 'bg-green-500/10 text-green-500 border border-green-500/30' : 
               syncStatus.nfe === 'syncing' ? 'bg-onyx/5 text-silver-dark cursor-not-allowed' :
               'bg-blue-500 text-white hover:bg-blue-600'
-            }\`}
+            }`}
           >
             {syncStatus.nfe === 'syncing' ? <><RefreshCw size={18} className="animate-spin" /> Sincronizando SEFAZ...</> :
              syncStatus.nfe === 'done' ? <><CheckCircle2 size={18} /> Sincronizado (Modo Teste)</> :
@@ -85,11 +85,11 @@ export default function AutomacaoFiscalPage() {
           <button 
             disabled={syncStatus.cnd !== 'idle'}
             onClick={() => simulateSync('cnd')}
-            className={\`w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all \${
+            className={`w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
               syncStatus.cnd === 'done' ? 'bg-green-500/10 text-green-500 border border-green-500/30' : 
               syncStatus.cnd === 'syncing' ? 'bg-onyx/5 text-silver-dark cursor-not-allowed' :
               'bg-purple-500 text-white hover:bg-purple-600'
-            }\`}
+            }`}
           >
             {syncStatus.cnd === 'syncing' ? <><RefreshCw size={18} className="animate-spin" /> Varrendo Portais...</> :
              syncStatus.cnd === 'done' ? <><CheckCircle2 size={18} /> CNDs Validadas (Modo Teste)</> :
@@ -110,11 +110,11 @@ export default function AutomacaoFiscalPage() {
           <button 
             disabled={syncStatus.ecac !== 'idle'}
             onClick={() => simulateSync('ecac')}
-            className={\`w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all \${
+            className={`w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
               syncStatus.ecac === 'done' ? 'bg-green-500/10 text-green-500 border border-green-500/30' : 
               syncStatus.ecac === 'syncing' ? 'bg-onyx/5 text-silver-dark cursor-not-allowed' :
               'bg-orange-500 text-white hover:bg-orange-600'
-            }\`}
+            }`}
           >
             {syncStatus.ecac === 'syncing' ? <><RefreshCw size={18} className="animate-spin" /> Acessando e-CAC...</> :
              syncStatus.ecac === 'done' ? <><CheckCircle2 size={18} /> Caixa Postal Lida (Modo Teste)</> :

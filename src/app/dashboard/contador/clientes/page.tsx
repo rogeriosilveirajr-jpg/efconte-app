@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Building, Search, ChevronRight, FileText, Users, AlertCircle, Plus, X, Key, Loader2, CheckCircle2 } from "lucide-react";
-import { cnpj as cnpjValidator } from 'cpf-cnpj-validator';
+import { cnpj as cnpjValidator, cpf as cpfValidator } from 'cpf-cnpj-validator';
 
 type Tenant = {
   id: string;
@@ -34,25 +34,45 @@ export default function MeusClientesPage() {
     const raw = value.replace(/\D/g, '');
     let formatted = raw;
     
-    // Aplica máscara XX.XXX.XXX/XXXX-XX
-    if (raw.length > 2) formatted = raw.replace(/^(\d{2})(\d)/, "$1.$2");
-    if (raw.length > 5) formatted = formatted.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
-    if (raw.length > 8) formatted = formatted.replace(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3/$4");
-    if (raw.length > 12) formatted = formatted.replace(/^(\d{2})\.(\d{3})\.(\d{3})\/(\d{4})(\d)/, "$1.$2.$3/$4-$5");
-    
-    // Limita tamanho
-    formatted = formatted.substring(0, 18);
-    setFormData({ ...formData, cnpj: formatted });
+    // Define se é CPF (até 11) ou CNPJ (mais de 11)
+    if (raw.length <= 11) {
+      // Máscara de CPF: 000.000.000-00
+      if (raw.length > 3) formatted = raw.replace(/^(\d{3})(\d)/, "$1.$2");
+      if (raw.length > 6) formatted = formatted.replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3");
+      if (raw.length > 9) formatted = formatted.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
+      
+      setFormData({ ...formData, cnpj: formatted });
 
-    if (raw.length === 14) {
-      if (!cnpjValidator.isValid(raw)) {
-        setCnpjError("CNPJ Inválido (dígito verificador incorreto)");
+      if (raw.length === 11) {
+        if (!cpfValidator.isValid(raw)) {
+          setCnpjError("CPF Inválido (dígito verificador incorreto)");
+        } else {
+          setCnpjError("");
+          setIsFetchingReceita(false); // Receita não busca CPF
+        }
       } else {
         setCnpjError("");
-        fetchReceitaWS(raw);
       }
     } else {
-      setCnpjError("");
+      // Máscara de CNPJ: 00.000.000/0000-00
+      if (raw.length > 2) formatted = raw.replace(/^(\d{2})(\d)/, "$1.$2");
+      if (raw.length > 5) formatted = formatted.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+      if (raw.length > 8) formatted = formatted.replace(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3/$4");
+      if (raw.length > 12) formatted = formatted.replace(/^(\d{2})\.(\d{3})\.(\d{3})\/(\d{4})(\d)/, "$1.$2.$3/$4-$5");
+      
+      formatted = formatted.substring(0, 18);
+      setFormData({ ...formData, cnpj: formatted });
+
+      if (raw.length === 14) {
+        if (!cnpjValidator.isValid(raw)) {
+          setCnpjError("CNPJ Inválido (dígito verificador incorreto)");
+        } else {
+          setCnpjError("");
+          fetchReceitaWS(raw);
+        }
+      } else {
+        setCnpjError("");
+      }
     }
   };
 
@@ -178,7 +198,7 @@ export default function MeusClientesPage() {
                     </div>
                     <div>
                       <h3 className="font-bold text-lg leading-tight group-hover:text-gold transition-colors">{tenant.name}</h3>
-                      <p className="text-xs text-silver-dark mt-1 font-mono">{tenant.cnpj || "Sem CNPJ"}</p>
+                      <p className="text-xs text-silver-dark mt-1 font-mono">{tenant.cnpj || "Sem Documento"}</p>
                     </div>
                   </div>
 
@@ -256,7 +276,7 @@ export default function MeusClientesPage() {
                   </div>
                   
                   <div className="flex flex-col gap-2">
-                    <label className="text-sm font-bold text-silver-dark">CNPJ</label>
+                    <label className="text-sm font-bold text-silver-dark">CPF ou CNPJ</label>
                                       <div className="relative">
                       <input 
                         type="text" 
@@ -264,7 +284,7 @@ export default function MeusClientesPage() {
                         value={formData.cnpj}
                         onChange={(e) => handleCnpjChange(e.target.value)}
                         className={`w-full px-4 py-3 bg-onyx/5 dark:bg-black/20 border ${cnpjError ? 'border-red-500' : 'border-onyx/10 dark:border-white/10'} rounded-lg focus:outline-none focus:border-gold pr-10`}
-                        placeholder="00.000.000/0000-00"
+                        placeholder="000.000.000-00 ou 00.000.000/0000-00"
                       />
                       {isFetchingReceita && <Loader2 size={18} className="absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-gold" />}
                       {!isFetchingReceita && formData.cnpj.length === 18 && !cnpjError && <CheckCircle2 size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500" />}
