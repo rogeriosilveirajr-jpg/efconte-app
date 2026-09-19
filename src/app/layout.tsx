@@ -12,7 +12,6 @@ export const metadata: Metadata = {
   description: "Contabilidade acessível, próxima e estratégica.",
 };
 
-import NewsTicker from "@/components/NewsTicker";
 
 export default function RootLayout({
   children,
@@ -23,7 +22,6 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body className={`${inter.variable} antialiased min-h-screen flex flex-col`}>
         {children}
-        <NewsTicker />
       </body>
     </html>
   );
