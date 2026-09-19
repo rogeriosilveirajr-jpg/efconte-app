@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import {
-  Bot, ReactNode, useState, useEffect } from "react";
+ReactNode, useState, useEffect } from "react";
 import {
   Bot,
   LayoutDashboard,
@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 import {
-  Bot, usePathname } from "next/navigation";
+usePathname } from "next/navigation";
 
 export default function AgencyDashboardLayout({
   children,
