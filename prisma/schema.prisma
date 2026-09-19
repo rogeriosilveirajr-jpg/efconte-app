@@ -141,6 +141,7 @@ model Document {
   tenantId     String
   title        String
   fileUrl      String
+  fileData     String?   @db.Text
   type         String    @default("OUTROS") // CONTRATO, IMPOSTO, DP, OUTROS
   status       String?   // PENDING, SIGNED (usado para contratos)
   signatureUrl String?   // URL da imagem da assinatura

@@ -37,45 +37,32 @@ export async function POST(request: Request) {
       }
     }
 
-    const bucket = "efconte-app.firebasestorage.app";
-    const cleanBucketName = bucket.replace('.firebasestorage.app', '.appspot.com'); 
-
-    const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
-    const filePath = encodeURIComponent(`documents/${tenantId}/${fileName}`);
+    // Convert file to Base64 for database storage
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const base64Data = buffer.toString('base64');
     
-    const url = `https://firebasestorage.googleapis.com/v0/b/efconte-app.appspot.com/o?name=${filePath}`;
-    
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': file.type,
-      },
-      body: file,
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error("Firebase upload failed:", errText);
-      return NextResponse.json({ error: 'Erro no Firebase Storage' }, { status: 500 });
-    }
-
-    const data = await response.json();
-    
-    const downloadToken = data.downloadTokens;
-    const fileUrl = `https://firebasestorage.googleapis.com/v0/b/efconte-app.appspot.com/o/${filePath}?alt=media&token=${downloadToken}`;
-
     const docType = (formData.get('type') as string) || 'OUTROS';
+    
+    // Create document in database
     const doc = await prisma.document.create({
       data: {
         tenantId,
         title: file.name,
-        fileUrl,
+        fileData: base64Data,
+        fileUrl: '', // Will update immediately below
         type: docType,
         status: docType === 'CONTRATO' ? 'PENDING' : null
       }
     });
 
-    return NextResponse.json({ success: true, document: doc });
+    // Update fileUrl to point to our new internal route
+    const updatedDoc = await prisma.document.update({
+      where: { id: doc.id },
+      data: { fileUrl: `/api/documents/${doc.id}` }
+    });
+
+    return NextResponse.json({ success: true, document: updatedDoc });
   } catch (error) {
     console.error('Erro no servidor:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
