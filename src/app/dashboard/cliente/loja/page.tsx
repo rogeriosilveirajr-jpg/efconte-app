@@ -112,8 +112,17 @@ export default function StorePage() {
     alert(`Obrigado pelo interesse no plano ${planName}! Nossa equipe entrará em contato em breve para realizar o upgrade da sua conta e tirar suas dúvidas.`);
   };
 
+  if (loadingPlans) {
+    return (
+      <div className="flex flex-col items-center justify-center w-full h-[60vh] gap-4">
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gold"></div>
+        <p className="text-silver-dark text-sm animate-pulse">Carregando catálogo oficial...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col gap-12 max-w-6xl mx-auto pb-12">
+    <div className="flex flex-col gap-12 max-w-6xl mx-auto pb-12 animate-in fade-in duration-500">
       
       {/* Header */}
       <section className="flex flex-col gap-3">
