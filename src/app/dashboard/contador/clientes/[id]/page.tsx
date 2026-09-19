@@ -307,8 +307,8 @@ function DocumentosTab({ tenant }: { tenant: any }) {
 
         if (res.ok) {
           const data = await res.json();
-          setSentFiles(prev => [file.name, ...prev]);
           alert('Documento enviado com sucesso!');
+          window.location.reload();
         } else {
           alert('Erro ao enviar o documento.');
         }
@@ -357,13 +357,23 @@ function DocumentosTab({ tenant }: { tenant: any }) {
           <h4 className="font-bold mb-4 flex items-center gap-2"><UploadCloud size={18} className="text-silver-dark"/> Enviados (Guias & Folha)</h4>
           <p className="text-sm text-silver-dark">Arquivos enviados pela contabilidade ficarão visíveis para o cliente.</p>
           <div className="mt-4 flex flex-col gap-2">
-            {sentFiles.map((file, idx) => (
-               <div key={idx} className="p-3 bg-background rounded-lg border border-onyx/10 dark:border-white/5 flex justify-between items-center">
-                 <span className="text-sm font-mono">{file}</span>
-                 <span className="text-xs text-green-500 font-bold">Enviado hoje</span>
+            {tenant.documents && tenant.documents.map((doc: any, idx: number) => (
+               <div key={idx} className="p-3 bg-background rounded-lg border border-onyx/10 dark:border-white/5 flex flex-col gap-1">
+                 <div className="flex justify-between items-center">
+                   <a href={doc.fileUrl} target="_blank" className="text-sm font-mono text-gold hover:underline">{doc.title}</a>
+                   <span className="text-xs bg-onyx/10 dark:bg-white/10 px-2 py-1 rounded font-bold">{doc.type}</span>
+                 </div>
+                 <div className="flex justify-between items-center mt-1">
+                   <span className="text-[10px] text-silver-dark">{new Date(doc.createdAt).toLocaleDateString('pt-BR')}</span>
+                   {doc.type === 'CONTRATO' && (
+                     <span className={`text-[10px] font-bold ${doc.status === 'SIGNED' ? 'text-green-500' : 'text-orange-500'}`}>
+                       {doc.status === 'SIGNED' ? 'Assinado' : 'Pendente'}
+                     </span>
+                   )}
+                 </div>
                </div>
             ))}
-            {sentFiles.length === 0 && (
+            {(!tenant.documents || tenant.documents.length === 0) && (
               <span className="text-xs text-silver-dark italic">Você ainda não enviou documentos para este cliente.</span>
             )}
           </div>

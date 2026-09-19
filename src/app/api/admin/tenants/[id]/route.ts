@@ -14,6 +14,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
         employees: { where: { isDeleted: false } },
         partners: { where: { isDeleted: false } },
         invoices: { include: { items: true }, orderBy: { dueDate: 'desc' } },
+        documents: { orderBy: { createdAt: 'desc' } },
         notifications: { orderBy: { createdAt: 'desc' }, take: 10 }
       }
     });
@@ -34,9 +35,10 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
   const { planId } = await request.json();
 
   try {
-    await prisma.subscription.update({
+    await prisma.subscription.upsert({
       where: { tenantId: id },
-      data: { planId }
+      update: { planId },
+      create: { tenantId: id, planId }
     });
     return NextResponse.json({ success: true });
   } catch (error) {
