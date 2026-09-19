@@ -30,13 +30,18 @@ export default function LoginPage() {
       setLoading(false);
     } else {
       setSuccess(true);
-      setTimeout(() => {
-        if (email.includes("contador")) {
-          router.push("/dashboard/contador");
-        } else {
-          router.push("/dashboard/cliente");
-        }
-      }, 800);
+      // Busca o perfil real para direcionar baseado na role, e não no email (evita falha de lógica)
+      fetch('/api/profile')
+        .then(res => res.json())
+        .then(data => {
+          setTimeout(() => {
+            if (data.user?.role === 'ADMIN') {
+              router.push("/dashboard/contador");
+            } else {
+              router.push("/dashboard/cliente");
+            }
+          }, 800);
+        });
     }
   };
 
