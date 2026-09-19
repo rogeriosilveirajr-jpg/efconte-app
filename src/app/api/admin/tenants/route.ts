@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { sendClientCredentials } from '@/lib/mail';
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -58,6 +59,13 @@ export async function POST(request: Request) {
           planId
         }
       });
+    }
+
+    // Envia email para o cliente (se SMTP estiver configurado)
+    try {
+      await sendClientCredentials(email, name, randomPassword);
+    } catch (mailError) {
+      console.error("Erro ao enviar email:", mailError);
     }
 
     // Retorna a senha gerada para exibir na tela pro contador
