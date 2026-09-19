@@ -31,7 +31,7 @@ export async function sendClientCredentials(email: string, companyName: string, 
           <p>Acesse o portal e acompanhe sua contabilidade de perto de forma segura e transparente.</p>
           
           <div style="background: #fff; border-left: 4px solid #D4AF37; padding: 15px; margin: 20px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-            <p style="margin: 0 0 10px 0;"><strong>Link de acesso:</strong> <a href="${process.env.NEXTAUTH_URL || 'https://efconte-app.vercel.app'}/login">Acessar Portal</a></p>
+            <p style="margin: 0 0 10px 0;"><strong>Link de acesso:</strong> <a href="${process.env.NEXTAUTH_URL || 'https://efconte-app-4r8j.vercel.app'}/login">Acessar Portal</a></p>
             <p style="margin: 0 0 10px 0;"><strong>E-mail (Login):</strong> ${email}</p>
             <p style="margin: 0;"><strong>Senha Temporária:</strong> <span style="background: #eee; padding: 3px 8px; border-radius: 4px; letter-spacing: 2px;">${pass}</span></p>
           </div>
