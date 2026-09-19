@@ -16,7 +16,7 @@ const BASE_PLANS: Plan[] = [
   {
     id: "start",
     name: "Start",
-    price: 199,
+    price: 347,
     icon: <Briefcase size={28} className="text-gray-500 dark:text-silver-dark" />,
     features: [
       "Até 2 Sócios incluídos",
@@ -28,7 +28,7 @@ const BASE_PLANS: Plan[] = [
   {
     id: "gestao",
     name: "Gestão",
-    price: 349,
+    price: 547,
     icon: <Star size={28} className="text-[#c9a96e]" />,
     isPopular: true,
     features: [
@@ -42,7 +42,7 @@ const BASE_PLANS: Plan[] = [
   {
     id: "prime",
     name: "Prime",
-    price: 549,
+    price: 1247,
     icon: <ShieldCheck size={28} className="text-gray-500 dark:text-silver-dark" />,
     features: [
       "Até 3 Sócios incluídos",
