@@ -1,7 +1,9 @@
 "use client";
 import Link from "next/link";
-import { ReactNode, useState, useEffect } from "react";
 import {
+  Bot, ReactNode, useState, useEffect } from "react";
+import {
+  Bot,
   LayoutDashboard,
   Users,
   Briefcase,
@@ -16,7 +18,8 @@ import {
   Edit2
 } from "lucide-react";
 
-import { usePathname } from "next/navigation";
+import {
+  Bot, usePathname } from "next/navigation";
 
 export default function AgencyDashboardLayout({
   children,
@@ -88,6 +91,7 @@ export default function AgencyDashboardLayout({
             <NavItem href="/dashboard/contador" icon={<LayoutDashboard size={20} />} label="Visão Geral" active={pathname === '/dashboard/contador'} />
             <NavItem href="/dashboard/contador/clientes" icon={<Building size={20} />} label="Meus Clientes" active={pathname?.startsWith('/dashboard/contador/clientes')} />
             <NavItem href="/dashboard/contador/faturamento" icon={<FileBarChart size={20} />} label="Faturamento e MRR" active={pathname === '/dashboard/contador/faturamento'} />
+            <NavItem href="/dashboard/contador/automacao" icon={<Bot size={20} />} label="Robô Fiscal (BETA)" active={pathname === '/dashboard/contador/automacao'} />
             <NavItem href="/dashboard/contador/crm" icon={<Handshake size={20} />} label="CRM Comercial" active={pathname === '/dashboard/contador/crm'} />
             <NavItem href="/dashboard/contador/reunioes" icon={<CalendarDays size={20} />} label="Reuniões Estratégicas" active={pathname === '/dashboard/contador/reunioes'} />
             <NavItem href="/dashboard/contador/loja" icon={<Briefcase size={20} />} label="Loja (Visão Cliente)" active={pathname === '/dashboard/contador/loja'} />

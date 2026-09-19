@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Building, Search, ChevronRight, FileText, Users, AlertCircle, Plus, X, Key } from "lucide-react";
+import { Building, Search, ChevronRight, FileText, Users, AlertCircle, Plus, X, Key, Loader2, CheckCircle2 } from "lucide-react";
+import { cnpj as cnpjValidator } from 'cpf-cnpj-validator';
 
 type Tenant = {
   id: string;
@@ -22,6 +23,60 @@ export default function MeusClientesPage() {
   const [formData, setFormData] = useState({ name: '', cnpj: '', email: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successData, setSuccessData] = useState<{email: string, password: string} | null>(null);
+
+  // Novos estados para Validação e ReceitaWS
+  const [cnpjError, setCnpjError] = useState("");
+  const [isFetchingReceita, setIsFetchingReceita] = useState(false);
+
+  // Mascara e valida CNPJ
+  const handleCnpjChange = (value: string) => {
+    // Remove tudo que não é número
+    const raw = value.replace(/\D/g, '');
+    let formatted = raw;
+    
+    // Aplica máscara XX.XXX.XXX/XXXX-XX
+    if (raw.length > 2) formatted = raw.replace(/^(\d{2})(\d)/, "$1.$2");
+    if (raw.length > 5) formatted = formatted.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+    if (raw.length > 8) formatted = formatted.replace(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3/$4");
+    if (raw.length > 12) formatted = formatted.replace(/^(\d{2})\.(\d{3})\.(\d{3})\/(\d{4})(\d)/, "$1.$2.$3/$4-$5");
+    
+    // Limita tamanho
+    formatted = formatted.substring(0, 18);
+    setFormData({ ...formData, cnpj: formatted });
+
+    if (raw.length === 14) {
+      if (!cnpjValidator.isValid(raw)) {
+        setCnpjError("CNPJ Inválido (dígito verificador incorreto)");
+      } else {
+        setCnpjError("");
+        fetchReceitaWS(raw);
+      }
+    } else {
+      setCnpjError("");
+    }
+  };
+
+  const fetchReceitaWS = async (rawCnpj: string) => {
+    setIsFetchingReceita(true);
+    try {
+      // Usando API gratuita do ReceitaWS
+      const res = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${rawCnpj}`);
+      if (res.ok) {
+        const data = await res.json();
+        setFormData(prev => ({
+          ...prev,
+          name: data.razao_social || data.nome_fantasia || prev.name
+        }));
+      } else {
+        setCnpjError("CNPJ não encontrado na Receita Federal");
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsFetchingReceita(false);
+    }
+  };
+
 
   useEffect(() => {
     fetchTenants();
@@ -202,14 +257,20 @@ export default function MeusClientesPage() {
                   
                   <div className="flex flex-col gap-2">
                     <label className="text-sm font-bold text-silver-dark">CNPJ</label>
-                    <input 
-                      type="text" 
-                      required
-                      value={formData.cnpj}
-                      onChange={(e) => setFormData({...formData, cnpj: e.target.value})}
-                      className="w-full px-4 py-3 bg-onyx/5 dark:bg-black/20 border border-onyx/10 dark:border-white/10 rounded-lg focus:outline-none focus:border-gold"
-                      placeholder="00.000.000/0000-00"
-                    />
+                                      <div className="relative">
+                      <input 
+                        type="text" 
+                        required
+                        value={formData.cnpj}
+                        onChange={(e) => handleCnpjChange(e.target.value)}
+                        className={`w-full px-4 py-3 bg-onyx/5 dark:bg-black/20 border ${cnpjError ? 'border-red-500' : 'border-onyx/10 dark:border-white/10'} rounded-lg focus:outline-none focus:border-gold pr-10`}
+                        placeholder="00.000.000/0000-00"
+                      />
+                      {isFetchingReceita && <Loader2 size={18} className="absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-gold" />}
+                      {!isFetchingReceita && formData.cnpj.length === 18 && !cnpjError && <CheckCircle2 size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500" />}
+                    </div>
+                    {cnpjError && <p className="text-red-500 text-xs mt-1 font-bold">{cnpjError}</p>}
+                    {!cnpjError && formData.cnpj.length === 18 && formData.name && <p className="text-green-500 text-xs mt-1">✓ Razão Social preenchida via Receita Federal</p>}
                   </div>
 
                   <div className="flex flex-col gap-2">
