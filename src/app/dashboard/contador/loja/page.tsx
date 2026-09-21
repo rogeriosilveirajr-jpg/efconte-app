@@ -20,7 +20,7 @@ export default function ContadorStorePage() {
     try {
       const res = await fetch('/api/admin/plans');
       const sRes = await fetch('/api/admin/settings');
-      const data = await res.json();
+      const data = await res.json() as any as any;
       setPlans(data.plans || []);
       const sData = await sRes.json();
       setSettings(sData.settings || []);

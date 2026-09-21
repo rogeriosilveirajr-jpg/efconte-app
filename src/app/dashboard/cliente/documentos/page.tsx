@@ -53,7 +53,7 @@ export default function DocumentosPage() {
       if (res.ok) {
         setUploadedFiles(prev => [file.name, ...prev]);
       } else {
-        const error = await res.json();
+        const error = await res.json() as any as any;
         console.error('API Error:', error);
         alert('Erro ao enviar documento. O Storage do Firebase bloqueou (CORS ou Permissão).');
       }

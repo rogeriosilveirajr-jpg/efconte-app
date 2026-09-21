@@ -33,7 +33,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
 export async function PUT(request: Request, context: { params: Promise<{ id: string }> }) {
   const params = await context.params;
   const { id } = params;
-  const { planId } = await request.json();
+  const { planId } = await request.json() as any;
 
   try {
     await prisma.subscription.upsert({
@@ -50,7 +50,7 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   const params = await context.params;
   const { id } = params;
-  const { action, description, amount } = await request.json();
+  const { action, description, amount } = await request.json() as any;
 
   try {
     if (action === 'ADD_INVOICE_ITEM') {

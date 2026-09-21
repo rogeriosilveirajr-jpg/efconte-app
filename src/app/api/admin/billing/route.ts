@@ -47,7 +47,7 @@ export async function GET() {
 
 export async function PUT(request: Request) {
   try {
-    const { id, status } = await request.json();
+    const { id, status } = await request.json() as any;
     await prisma.invoice.update({
       where: { id },
       data: { status }

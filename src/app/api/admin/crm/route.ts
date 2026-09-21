@@ -15,7 +15,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const data = await request.json();
+    const data = await request.json() as any;
     const lead = await prisma.lead.create({
       data: {
         name: data.name,
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   try {
-    const { id, status, cnpj } = await request.json();
+    const { id, status, cnpj } = await request.json() as any;
     
     const lead = await prisma.lead.update({
       where: { id },

@@ -15,7 +15,7 @@ export default function FaturamentoPage() {
     setLoading(true);
     try {
       const res = await fetch('/api/admin/billing');
-      const data = await res.json();
+      const data = await res.json() as any as any;
       if (!data.error) setFinanceiro(data);
     } catch (e) {
       console.error(e);

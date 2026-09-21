@@ -10,7 +10,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    const { documentId, signatureBase64 } = await request.json();
+    const { documentId, signatureBase64 } = await request.json() as any;
 
     if (!documentId || !signatureBase64) {
       return NextResponse.json({ error: 'Faltam dados' }, { status: 400 });

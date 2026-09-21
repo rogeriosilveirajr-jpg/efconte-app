@@ -250,7 +250,7 @@ function AdmissionWizard({ onClose, onSuccess }: { onClose: () => void, onSucces
       if (res.ok) {
         onSuccess(formData.name);
       } else {
-        const errorData = await res.json().catch(() => ({}));
+        const errorData = await res.json().catch(() => ({})) as any;
         alert(`Erro ao processar: ${errorData.error || res.statusText}`);
       }
     } catch (e) {
@@ -492,7 +492,7 @@ function TerminationWizard({ employees, onClose, onSuccess }: { employees: any[]
       if (res.ok) {
         onSuccess(formData.employeeId);
       } else {
-        const errorData = await res.json().catch(() => ({}));
+        const errorData = await res.json().catch(() => ({})) as any;
         alert(`Erro ao processar: ${errorData.error || res.statusText}`);
       }
     } catch (e) {

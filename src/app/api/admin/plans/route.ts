@@ -15,7 +15,7 @@ export async function GET() {
 
 export async function PUT(request: Request) {
   try {
-    const { id, name, basePrice } = await request.json();
+    const { id, name, basePrice } = await request.json() as any;
     const plan = await prisma.plan.update({
       where: { id },
       data: { name, basePrice }

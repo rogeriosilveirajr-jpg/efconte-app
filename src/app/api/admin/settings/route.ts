@@ -8,7 +8,7 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
-  const { settings } = await request.json(); // Array of { key, value }
+  const { settings } = await request.json() as any; // Array of { key, value }
   for (const s of settings) {
     await prisma.setting.upsert({
       where: { key: s.key },

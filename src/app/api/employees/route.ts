@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { name, role } = await request.json();
+  const { name, role } = await request.json() as any;
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email as string },
@@ -91,7 +91,7 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { id } = await request.json();
+  const { id } = await request.json() as any;
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email as string },

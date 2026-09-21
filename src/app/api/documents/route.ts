@@ -47,7 +47,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    const data = await request.json();
+    const data = await request.json() as any;
     
     // VERIFICAÇÃO DE SEGURANÇA CONTRA HACKERS (IDOR)
     if (session.user.role !== 'ADMIN') {

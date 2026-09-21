@@ -82,7 +82,7 @@ export default function MeusClientesPage() {
       // Usando API gratuita do ReceitaWS
       const res = await fetch(`https://brasilapi.com.br/api/cnpj/v1/${rawCnpj}`);
       if (res.ok) {
-        const data = await res.json();
+        const data = await res.json() as any as any;
         setFormData(prev => ({
           ...prev,
           name: data.razao_social || data.nome_fantasia || prev.name
@@ -105,7 +105,7 @@ export default function MeusClientesPage() {
   async function fetchTenants() {
     try {
       const res = await fetch('/api/admin/tenants');
-      const data = await res.json();
+      const data = await res.json() as any as any;
       setTenants(data.tenants || []);
     } catch (e) {
       console.error(e);
@@ -123,7 +123,7 @@ export default function MeusClientesPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
-      const data = await res.json();
+      const data = await res.json() as any as any;
       if (data.success) {
         setSuccessData({ email: formData.email, password: data.generatedPassword });
         fetchTenants(); // Recarrega a lista

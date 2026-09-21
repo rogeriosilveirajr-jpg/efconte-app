@@ -14,7 +14,7 @@ export default function ReunioesPage() {
   const fetchMeetings = async () => {
     try {
       const res = await fetch('/api/admin/meetings');
-      const data = await res.json();
+      const data = await res.json() as any as any;
       setMeetings(data.meetings || []);
     } catch (e) {
       console.error(e);

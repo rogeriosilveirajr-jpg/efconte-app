@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { type, message, metadata } = await request.json();
+  const { type, message, metadata } = await request.json() as any;
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email as string },
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
-  const { id } = await request.json();
+  const { id } = await request.json() as any;
 
   await prisma.notification.update({
     where: { id },

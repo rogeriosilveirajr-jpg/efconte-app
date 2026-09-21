@@ -43,7 +43,7 @@ export default function ClientContracts() {
 
       const res = await fetch(`/api/documents?tenantId=${tenantId}`);
       if (res.ok) {
-        const data = await res.json();
+        const data = await res.json() as any as any;
         // Filtra apenas os do tipo CONTRATO
         setContracts(data.documents.filter((d: Document) => d.type === 'CONTRATO'));
       }
@@ -80,7 +80,7 @@ export default function ClientContracts() {
         setSelectedContract(null);
         fetchContracts();
       } else {
-        const err = await res.json();
+        const err = await res.json() as any as any;
         alert(err.error || "Erro ao assinar o contrato.");
       }
     } catch (error) {

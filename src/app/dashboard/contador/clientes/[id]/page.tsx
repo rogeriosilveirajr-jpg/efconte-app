@@ -26,7 +26,7 @@ export default function ClientProfilePage() {
   const fetchTenant = async () => {
     try {
       const res = await fetch(`/api/admin/tenants/${id}`);
-      const data = await res.json();
+      const data = await res.json() as any as any;
       setTenant(data.tenant);
       setPlans(data.plans || []);
     } catch (e) {
@@ -307,7 +307,7 @@ function DocumentosTab({ tenant }: { tenant: any }) {
         });
 
         if (res.ok) {
-          const data = await res.json();
+          const data = await res.json() as any as any;
           alert('Documento enviado com sucesso!');
           window.location.reload();
         } else {

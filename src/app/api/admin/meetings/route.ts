@@ -16,7 +16,7 @@ export async function GET() {
 
 export async function PUT(request: Request) {
   try {
-    const { id, status, meetingUrl } = await request.json();
+    const { id, status, meetingUrl } = await request.json() as any;
     await prisma.meeting.update({
       where: { id },
       data: { status, meetingUrl }
@@ -29,7 +29,7 @@ export async function PUT(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const data = await request.json();
+    const data = await request.json() as any;
     const meeting = await prisma.meeting.create({
       data: {
         tenantId: data.tenantId,

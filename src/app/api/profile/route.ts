@@ -10,7 +10,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { name } = await request.json();
+    const { name } = await request.json() as any;
 
     const updated = await prisma.user.update({
       where: { email: session.user.email as string },

@@ -12,8 +12,7 @@
   },
   "dependencies": {
     "@cloudflare/next-on-pages": "^1.13.16",
-    "@neondatabase/serverless": "^1.1.0",
-    "@prisma/adapter-neon": "^5.22.0",
+    "@prisma/adapter-d1": "^5.22.0",
     "@prisma/adapter-pg": "^5.22.0",
     "@prisma/client": "^5.22.0",
     "@types/react-signature-canvas": "^1.0.7",
