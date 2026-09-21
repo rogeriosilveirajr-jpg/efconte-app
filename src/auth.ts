@@ -36,7 +36,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return token;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || "efconte-super-secret-key-140623",
+  trustHost: true,
   pages: {
     signIn: "/login",
   },
