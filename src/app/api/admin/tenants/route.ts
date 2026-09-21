@@ -1,12 +1,12 @@
+export const runtime = "edge";
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '../../auth/[...nextauth]/route';
+import { auth } from "@/auth";
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { sendClientCredentials } from '@/lib/mail';
 
 export async function GET() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   
   const tenants = await prisma.tenant.findMany({
     where: { isDeleted: false },
@@ -24,7 +24,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     // Ideal check: if (session?.user?.role !== 'CONTADOR') return unauthorized;
 
     const { name, cnpj, email, planId } = await request.json();
