@@ -1,4 +1,5 @@
 "use client";
+export const runtime = "edge";
 
 import { useState, useEffect } from "react";
 import StorePage from "../../cliente/loja/page";

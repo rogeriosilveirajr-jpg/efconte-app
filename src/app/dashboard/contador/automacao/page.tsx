@@ -1,4 +1,5 @@
 "use client";
+export const runtime = "edge";
 
 import { useState } from "react";
 import { Settings, RefreshCw, FileText, DownloadCloud, CheckCircle2, AlertCircle } from "lucide-react";

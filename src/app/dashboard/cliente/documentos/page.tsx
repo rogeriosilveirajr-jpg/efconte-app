@@ -1,4 +1,5 @@
 "use client";
+export const runtime = "edge";
 
 import { useState, useRef } from "react";
 import { FileText, UploadCloud, FileSpreadsheet, FileCode, CheckCircle2, ChevronRight, FolderArchive } from "lucide-react";
