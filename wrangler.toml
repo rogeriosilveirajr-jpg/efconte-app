@@ -8,6 +8,3 @@ binding = "DB"
 database_name = "efconte-db"
 database_id = "70fc6af6-d067-4ace-9e98-800056754b62"
 
-[vars]
-NEXTAUTH_SECRET = "efconte-super-secret-key-140623"
-NEXTAUTH_URL = "https://efconte-app.pages.dev"
