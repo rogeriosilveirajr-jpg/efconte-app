@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
-    "pages:build": "npx @cloudflare/next-on-pages",
+    "pages:build": "npx vercel build && rm -rf .vercel/output/functions/_global-error* .vercel/output/functions/_not-found* && npx @cloudflare/next-on-pages --skip-build",
     "start": "next start",
     "lint": "eslint",
     "test": "jest"
