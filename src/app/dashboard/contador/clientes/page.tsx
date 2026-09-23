@@ -255,8 +255,24 @@ export default function MeusClientesPage() {
                   </div>
 
                   <button 
+                    onClick={() => {
+                      const msg = `Olá! O seu acesso ao Portal do Cliente da Contabilidade foi criado.\n\n*Acesse em:* https://efconte-app.pages.dev/login\n*Login:* ${successData.email}\n*Senha:* ${successData.password}\n\nRecomendamos alterar a senha no seu primeiro acesso.`;
+                      let phoneNum = formData.phone.replace(/\D/g, '');
+                      if (phoneNum && phoneNum.length >= 10) {
+                        if (!phoneNum.startsWith('55')) phoneNum = '55' + phoneNum;
+                        window.open(`https://wa.me/${phoneNum}?text=${encodeURIComponent(msg)}`, '_blank');
+                      } else {
+                        alert("O cliente não tem um telefone válido cadastrado.");
+                      }
+                    }}
+                    className="w-full mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+                  >
+                    Enviar Acesso via WhatsApp
+                  </button>
+
+                  <button 
                     onClick={() => setIsModalOpen(false)}
-                    className="w-full mt-4 bg-onyx/10 dark:bg-white/10 hover:bg-onyx/20 dark:hover:bg-white/20 font-bold py-3 rounded-lg transition-colors"
+                    className="w-full mt-2 bg-onyx/10 dark:bg-white/10 hover:bg-onyx/20 dark:hover:bg-white/20 font-bold py-3 rounded-lg transition-colors"
                   >
                     Fechar
                   </button>
