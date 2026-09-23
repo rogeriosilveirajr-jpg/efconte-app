@@ -41,7 +41,7 @@ export default function DocumentosPage() {
   const uploadFileToServer = async (file: File) => {
     setIsUploading(true);
     try {
-      await new Promise<void>((resolve, reject) => {
+      await new Promise<void>((resolve) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = async () => {
@@ -59,14 +59,13 @@ export default function DocumentosPage() {
             
             if (res.ok) {
               setUploadedFiles(prev => [file.name, ...prev]);
-              resolve();
             } else {
               alert('Erro ao enviar documento. Acesso negado ou dados incorretos.');
-              resolve();
             }
           } catch (e) {
             console.error('Upload failed:', e);
             alert('Erro de conexão ao tentar enviar o documento.');
+          } finally {
             resolve();
           }
         };

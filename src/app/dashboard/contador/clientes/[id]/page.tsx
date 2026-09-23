@@ -323,6 +323,10 @@ function DocumentosTab({ tenant }: { tenant: any }) {
           setUploading(false);
         }
       };
+      reader.onerror = () => {
+        alert('Erro ao ler o arquivo.');
+        setUploading(false);
+      };
     }
   };
 
