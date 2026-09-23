@@ -261,7 +261,6 @@ function FaturasTab({ tenant, onOpenInvoiceModal }: { tenant: any, onOpenInvoice
                   {inv.items?.length || 0} serviços
                 </td>
                 <td className="px-6 py-4 text-right">
-                  <button onClick={() => alert("A fatura detalhada abriria aqui.")} className="text-silver-dark hover:text-gold text-xs font-bold transition-colors">Ver Detalhes</button>
                 </td>
               </tr>
             ))}
@@ -345,18 +344,17 @@ function DocumentosTab({ tenant }: { tenant: any }) {
           <h4 className="font-bold mb-4 flex items-center gap-2"><Download size={18} className="text-gold"/> Recebidos do Cliente</h4>
           <p className="text-sm text-silver-dark">Os documentos enviados pelo cliente aparecem aqui.</p>
           <div className="mt-4 flex flex-col gap-2">
-            {tenant.notifications?.filter((n:any)=>n.type==='DOCUMENTO').map((docNotif:any) => {
-              const meta = docNotif.metadata ? JSON.parse(docNotif.metadata) : {};
-              const files = meta.fileNames || ["Arquivo.pdf"];
-              return files.map((file: string, idx: number) => (
-                <div key={docNotif.id+idx} className="p-3 bg-background rounded-lg border border-onyx/10 dark:border-white/5 flex justify-between items-center">
-                  <span className="text-sm font-mono truncate mr-2">{file}</span>
-                  <button onClick={() => alert("Simulando download...")} className="text-gold text-xs font-bold hover:underline shrink-0">Baixar</button>
-                </div>
-              ));
-            })}
-            {tenant.notifications?.filter((n:any)=>n.type==='DOCUMENTO').length === 0 && (
-              <span className="text-xs text-silver-dark italic">Nenhum documento recente.</span>
+            {tenant.documents?.filter((d:any)=>d.type==='OUTROS').map((doc:any, idx:number) => (
+               <div key={idx} className="p-3 bg-background rounded-lg border border-onyx/10 dark:border-white/5 flex justify-between items-center">
+                 <div className="flex flex-col truncate mr-2">
+                   <span className="text-sm font-mono truncate">{doc.title}</span>
+                   <span className="text-[10px] text-silver-dark">{new Date(doc.createdAt).toLocaleDateString('pt-BR')}</span>
+                 </div>
+                 <a href={doc.fileUrl} target="_blank" className="text-gold text-xs font-bold hover:underline shrink-0">Baixar</a>
+               </div>
+            ))}
+            {(!tenant.documents || tenant.documents.filter((d:any)=>d.type==='OUTROS').length === 0) && (
+              <span className="text-xs text-silver-dark italic">Nenhum documento recebido.</span>
             )}
           </div>
         </div>
@@ -365,7 +363,7 @@ function DocumentosTab({ tenant }: { tenant: any }) {
           <h4 className="font-bold mb-4 flex items-center gap-2"><UploadCloud size={18} className="text-silver-dark"/> Enviados (Guias & Folha)</h4>
           <p className="text-sm text-silver-dark">Arquivos enviados pela contabilidade ficarão visíveis para o cliente.</p>
           <div className="mt-4 flex flex-col gap-2">
-            {tenant.documents && tenant.documents.map((doc: any, idx: number) => (
+            {tenant.documents && tenant.documents.filter((d:any)=>d.type !== 'OUTROS').map((doc: any, idx: number) => (
                <div key={idx} className="p-3 bg-background rounded-lg border border-onyx/10 dark:border-white/5 flex flex-col gap-1">
                  <div className="flex justify-between items-center">
                    <a href={doc.fileUrl} target="_blank" className="text-sm font-mono text-gold hover:underline">{doc.title}</a>
@@ -417,7 +415,6 @@ function DepartamentoPessoalTab({ tenant }: { tenant: any }) {
                   <span className="text-xs font-bold px-2 py-1 rounded bg-blue-500/20 text-blue-500">CLT</span>
                 </td>
                 <td className="px-6 py-4 text-right">
-                   <button onClick={() => alert("Mostra os dados completos do eSocial do funcionário.")} className="text-xs font-bold text-silver-dark hover:text-gold transition-colors">Detalhes</button>
                 </td>
               </tr>
             ))}

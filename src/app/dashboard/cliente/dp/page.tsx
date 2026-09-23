@@ -172,7 +172,7 @@ export default function DepartamentoPessoalPage() {
             )}
             
             <button 
-              onClick={() => alert('Disponível apenas quando todos os documentos estiverem gerados.')}
+              onClick={() => alert('O pacote ZIP estara disponivel assim que todos os documentos da folha forem fechados pelo contador.')}
               className="mt-4 w-full py-2 bg-onyx/5 dark:bg-white/5 border border-onyx/20 dark:border-white/10 hover:border-gold hover:text-gold rounded-lg font-bold text-sm transition-colors flex items-center justify-center gap-2"
             >
               <Download size={16} /> Baixar Pacote Completo

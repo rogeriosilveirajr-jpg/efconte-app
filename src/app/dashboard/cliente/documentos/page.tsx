@@ -1,13 +1,25 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { FileText, UploadCloud, FileSpreadsheet, FileCode, CheckCircle2, ChevronRight, FolderArchive } from "lucide-react";
 
 export default function DocumentosPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
+  const [pastDocuments, setPastDocuments] = useState<any[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    fetch('/api/documents')
+      .then(res => res.json())
+      .then(data => {
+        if (data.documents) {
+          setPastDocuments(data.documents.filter((d: any) => d.type === 'OUTROS'));
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -58,6 +70,8 @@ export default function DocumentosPage() {
             });
             
             if (res.ok) {
+              const docResponse = await res.json() as any;
+              setPastDocuments(prev => [docResponse.document, ...prev]);
               setUploadedFiles(prev => [file.name, ...prev]);
             } else {
               alert('Erro ao enviar documento. Acesso negado ou dados incorretos.');
@@ -180,27 +194,21 @@ export default function DocumentosPage() {
             Enviados recentemente
           </h3>
           
-          {uploadedFiles.length === 0 ? (
+          {pastDocuments.length === 0 ? (
             <div className="flex-1 flex items-center justify-center text-sm text-silver-dark italic">
               Nenhum arquivo enviado este mês.
             </div>
           ) : (
             <div className="flex flex-col gap-3">
-              {uploadedFiles.map((file, idx) => (
+              {pastDocuments.map((doc, idx) => (
                 <div key={idx} className="flex items-center justify-between p-3 bg-onyx/5 dark:bg-white/5 rounded-lg border border-onyx/5 dark:border-white/5">
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 size={16} className="text-green-500" />
-                    <span className="text-sm font-medium">{file}</span>
+                  <div className="flex items-center gap-3 truncate mr-2">
+                    <CheckCircle2 size={16} className="text-green-500 shrink-0" />
+                    <span className="text-sm font-medium truncate">{doc.title}</span>
                   </div>
-                  <span className="text-xs text-silver-dark">Agora mesmo</span>
+                  <a href={doc.fileUrl} target="_blank" className="text-xs text-gold hover:underline shrink-0">Baixar</a>
                 </div>
               ))}
-              <button 
-                onClick={() => alert(`Histórico completo:\n\n${uploadedFiles.join('\n')}`)}
-                className="text-sm text-gold hover:underline mt-2 text-left font-bold flex items-center gap-1"
-              >
-                Ver histórico completo <ChevronRight size={16} />
-              </button>
             </div>
           )}
         </div>
