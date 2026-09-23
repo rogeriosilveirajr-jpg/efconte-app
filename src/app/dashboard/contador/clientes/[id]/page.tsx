@@ -24,7 +24,7 @@ export default function ClientProfilePage() {
 
   const fetchTenant = async () => {
     try {
-      const res = await fetch(`/api/admin/tenants/${id}`);
+      const res = await fetch(`/api/admin/tenants/${id}`, { cache: 'no-store' });
       const data = await res.json() as any as any;
       setTenant(data.tenant);
       setPlans(data.plans || []);
@@ -47,11 +47,10 @@ export default function ClientProfilePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ planId })
       });
-      await fetchTenant();
-      setIsUpgradeModalOpen(false);
+      // Force a full page reload to bust Next.js client router cache
+      window.location.reload();
     } catch (e) {
       console.error(e);
-    } finally {
       setProcessing(false);
     }
   };

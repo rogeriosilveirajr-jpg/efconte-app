@@ -12,9 +12,9 @@ export default function AgencyDashboard() {
   const fetchData = async () => {
     try {
       const [resNotif, resBill, resTen] = await Promise.all([
-        fetch('/api/notifications'),
-        fetch('/api/admin/billing'),
-        fetch('/api/admin/tenants')
+        fetch('/api/notifications', { cache: 'no-store' }),
+        fetch('/api/admin/billing', { cache: 'no-store' }),
+        fetch('/api/admin/tenants', { cache: 'no-store' })
       ]);
 
       const dataNotif = await resNotif.json();
