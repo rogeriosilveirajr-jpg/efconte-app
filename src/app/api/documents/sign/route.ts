@@ -38,16 +38,14 @@ export async function POST(request: Request) {
     }
 
     // Atualiza o documento no banco com a assinatura
-    const updatedDoc = await prisma.document.update({
-      where: { id: documentId },
-      data: {
-        status: 'SIGNED',
-        signatureUrl: signatureBase64, // Guardando em base64 direto no banco para o MVP (super leve para assinaturas em preto/branco).
-        signedAt: new Date()
-      }
-    });
+    // Usa $executeRawUnsafe para evitar que o Prisma Engine (WASM) crashe com strings base64 muito grandes no AST
+    await prisma.$executeRawUnsafe(
+      `UPDATE Document SET status = 'SIGNED', signatureUrl = ?, signedAt = CURRENT_TIMESTAMP WHERE id = ?`,
+      signatureBase64,
+      documentId
+    );
 
-    return NextResponse.json({ success: true, document: updatedDoc });
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Erro ao assinar documento:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });
