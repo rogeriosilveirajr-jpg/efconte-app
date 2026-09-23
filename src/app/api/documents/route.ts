@@ -11,9 +11,23 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const tenantId = searchParams.get('tenantId');
+    let tenantId = searchParams.get('tenantId');
 
-    if (!tenantId) return NextResponse.json({ error: 'tenantId is required' }, { status: 400 });
+    if (!tenantId) {
+      if (session.user.role === 'CLIENTE') {
+        const user = await prisma.user.findUnique({
+          where: { email: session.user.email as string },
+          include: { tenants: true }
+        });
+        if (user?.tenants?.[0]?.tenantId) {
+          tenantId = user.tenants[0].tenantId;
+        } else {
+          return NextResponse.json({ error: 'tenantId is required' }, { status: 400 });
+        }
+      } else {
+        return NextResponse.json({ error: 'tenantId is required' }, { status: 400 });
+      }
+    }
 
     // VERIFICAÇÃO DE SEGURANÇA CONTRA HACKERS (IDOR)
     // Se não for admin/contador, só pode ver os documentos do PRÓPRIO tenant.

@@ -9,11 +9,20 @@ export default function DepartamentoPessoalPage() {
   const [employees, setEmployees] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [documents, setDocuments] = useState<any[]>([]);
+
   useEffect(() => {
-    fetch('/api/employees')
-      .then(res => res.json())
-      .then(data => {
-        setEmployees(data.employees || []);
+    Promise.all([
+      fetch('/api/employees'),
+      fetch('/api/documents')
+    ])
+      .then(async ([resEmp, resDoc]) => {
+        const dataEmp = await resEmp.json();
+        const dataDoc = await resDoc.json();
+        setEmployees(dataEmp.employees || []);
+        if (dataDoc.documents) {
+          setDocuments(dataDoc.documents.filter((d: any) => d.type === 'DP'));
+        }
         setLoading(false);
       })
       .catch(err => {
@@ -142,29 +151,28 @@ export default function DepartamentoPessoalPage() {
           <div className="p-6 border-b border-onyx/10 dark:border-white/5">
             <h2 className="font-bold text-lg flex items-center gap-2">
               <FileText size={20} className="text-gold" />
-              Folha: Agosto/2026
+              Folha: {new Date().toLocaleString('pt-BR', { month: 'long' }).charAt(0).toUpperCase() + new Date().toLocaleString('pt-BR', { month: 'long' }).slice(1)}/{new Date().getFullYear()}
             </h2>
           </div>
           
           <div className="p-6 flex flex-col gap-4">
-            <DocumentDownload 
-              title="Holerites da Equipe (PDF)" 
-              status="Disponível" 
-              onClick={() => handleDownload("Holerites da Equipe")}
-            />
-            <DocumentDownload 
-              title="Guia do FGTS" 
-              status="Disponível" 
-              onClick={() => handleDownload("Guia do FGTS")}
-            />
-            <DocumentDownload 
-              title="Guia do INSS (DARF)" 
-              status="Processando" 
-              isPending 
-            />
+            {documents.length === 0 ? (
+              <p className="text-sm text-silver-dark text-center py-4">
+                Nenhum documento de folha enviado ainda.
+              </p>
+            ) : (
+              documents.map(doc => (
+                <DocumentDownload 
+                  key={doc.id}
+                  title={doc.title} 
+                  status="Disponível" 
+                  onClick={() => window.open(doc.fileUrl, '_blank')}
+                />
+              ))
+            )}
             
             <button 
-              onClick={handleDownloadAll}
+              onClick={() => alert('Disponível apenas quando todos os documentos estiverem gerados.')}
               className="mt-4 w-full py-2 bg-onyx/5 dark:bg-white/5 border border-onyx/20 dark:border-white/10 hover:border-gold hover:text-gold rounded-lg font-bold text-sm transition-colors flex items-center justify-center gap-2"
             >
               <Download size={16} /> Baixar Pacote Completo
