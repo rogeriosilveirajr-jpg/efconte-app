@@ -46,7 +46,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         bytes[i] = binaryString.charCodeAt(i);
     }
     
-    return new NextResponse(buffer, {
     return new NextResponse(bytes, {
       headers: {
         'Content-Type': 'application/pdf', 

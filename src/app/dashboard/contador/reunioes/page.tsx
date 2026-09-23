@@ -32,7 +32,6 @@ export default function ReunioesPage() {
     fetchMeetings();
   };
 
-  const setMeetingLink = (id: string, currentUrl: string) => {
   const setMeetingLink = (id: string, currentUrl: string, tenantName?: string, tenantPhone?: string, meetingTitle?: string, meetingDate?: string) => {
     const url = prompt('Cole o link do Google Meet / Zoom para esta reunião:', currentUrl || '');
     if (url !== null) {
