@@ -8,7 +8,7 @@ export default function WhatsAppChat() {
   const [message, setMessage] = useState('');
   
   // Substitua pelo número real do WhatsApp do escritório (apenas números, com código do país)
-  const WHATSAPP_NUMBER = "5511999999999"; 
+  const WHATSAPP_NUMBER = "5547992187868";
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();

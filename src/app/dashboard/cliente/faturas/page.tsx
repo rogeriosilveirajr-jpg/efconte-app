@@ -135,7 +135,7 @@ export default function FaturasPage() {
             <button 
               onClick={() => {
                 const message = encodeURIComponent(`Olá, gostaria de pagar a minha fatura atual em aberto no valor de R$ ${pendingInvoice?.totalAmount || '0.00'}.`);
-                window.open(`https://wa.me/5511999999999?text=${message}`, '_blank');
+                window.open(`https://wa.me/5547992187868?text=${message}`, '_blank');
               }}
               className="w-full py-4 mt-auto rounded-xl border border-transparent bg-[#25D366] hover:bg-[#128C7E] flex items-center justify-center gap-3 transition-colors text-white shadow-lg"
             >
