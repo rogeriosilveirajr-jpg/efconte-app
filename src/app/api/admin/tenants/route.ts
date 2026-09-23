@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     const session = await auth();
     // Ideal check: if (session?.user?.role !== 'CONTADOR') return unauthorized;
 
-    const { name, cnpj, email, planId } = await request.json() as any;
+    const { name, cnpj, email, planId, phone } = await request.json() as any;
 
     // Generate random password (6 chars)
     const randomPassword = Math.floor(100000 + Math.random() * 900000).toString();
@@ -38,6 +38,7 @@ export async function POST(request: Request) {
       data: {
         name,
         cnpj,
+        phone,
         users: {
           create: {
             user: {

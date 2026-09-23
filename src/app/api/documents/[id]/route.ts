@@ -39,12 +39,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       return new NextResponse('No file data', { status: 404 });
     }
 
+    const buffer = Buffer.from(doc.fileData, 'base64');
     const binaryString = atob(doc.fileData);
     const bytes = new Uint8Array(binaryString.length);
     for (let i = 0; i < binaryString.length; i++) {
         bytes[i] = binaryString.charCodeAt(i);
     }
     
+    return new NextResponse(buffer, {
     return new NextResponse(bytes, {
       headers: {
         'Content-Type': 'application/pdf', 

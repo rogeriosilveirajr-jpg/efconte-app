@@ -32,10 +32,27 @@ export default function ReunioesPage() {
     fetchMeetings();
   };
 
-  const setMeetingLink = (id: string, currentUrl: string) => {
+  const setMeetingLink = (id: string, currentUrl: string, tenantName?: string, tenantPhone?: string, meetingTitle?: string, meetingDate?: string) => {
     const url = prompt('Cole o link do Google Meet / Zoom para esta reunião:', currentUrl || '');
     if (url !== null) {
       updateMeeting(id, { meetingUrl: url });
+      
+      if (tenantPhone && url) {
+        // Envia mensagem pelo WhatsApp automaticamente
+        const dateStr = new Date(meetingDate || '').toLocaleDateString('pt-BR');
+        const timeStr = new Date(meetingDate || '').toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+        
+        const msg = `Olá! A sua reunião de consultoria contábil ("${meetingTitle}") agendada para ${dateStr} às ${timeStr} foi confirmada pelo seu contador. \n\nAcesse no link: ${url}`;
+        
+        // Remove caracteres não numéricos do telefone
+        let phoneNum = tenantPhone.replace(/\D/g, '');
+        if (phoneNum && phoneNum.length >= 10) {
+          if (!phoneNum.startsWith('55')) phoneNum = '55' + phoneNum;
+          window.open(`https://wa.me/${phoneNum}?text=${encodeURIComponent(msg)}`, '_blank');
+        } else {
+          alert('Link salvo com sucesso, mas o cliente não tem um telefone válido cadastrado para envio do WhatsApp.');
+        }
+      }
     }
   };
 
@@ -94,12 +111,12 @@ export default function ReunioesPage() {
                     <div className="mb-4 bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/30 p-3 rounded-lg flex flex-col gap-2">
                       <p className="text-xs text-green-700 dark:text-green-400 font-bold flex items-center gap-1"><Video size={14} /> Link Gerado</p>
                       <a href={meeting.meetingUrl} target="_blank" rel="noreferrer" className="text-sm text-blue-600 dark:text-blue-400 underline truncate">{meeting.meetingUrl}</a>
-                      <button onClick={() => setMeetingLink(meeting.id, meeting.meetingUrl)} className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-left mt-1">Alterar Link</button>
+                      <button onClick={() => setMeetingLink(meeting.id, meeting.meetingUrl, meeting.tenant?.name, meeting.tenant?.phone, meeting.title, meeting.date)} className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-left mt-1">Alterar Link</button>
                     </div>
                   ) : (
                     <div className="mb-4 bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-900/30 p-3 rounded-lg">
                       <p className="text-xs text-yellow-700 dark:text-yellow-400 font-bold mb-2">Aguardando Link</p>
-                      <button onClick={() => setMeetingLink(meeting.id, '')} className="bg-white dark:bg-[#252525] border border-gray-300 dark:border-[#444] text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded text-sm w-full font-medium hover:bg-gray-50 dark:hover:bg-[#333] transition">
+                      <button onClick={() => setMeetingLink(meeting.id, '', meeting.tenant?.name, meeting.tenant?.phone, meeting.title, meeting.date)} className="bg-white dark:bg-[#252525] border border-gray-300 dark:border-[#444] text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded text-sm w-full font-medium hover:bg-gray-50 dark:hover:bg-[#333] transition">
                         + Inserir Link da Reunião
                       </button>
                     </div>

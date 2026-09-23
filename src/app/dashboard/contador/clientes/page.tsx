@@ -20,7 +20,7 @@ export default function MeusClientesPage() {
   
   // Modal de Criação
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: '', cnpj: '', email: '' });
+  const [formData, setFormData] = useState({ name: '', cnpj: '', email: '', phone: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successData, setSuccessData] = useState<{email: string, password: string} | null>(null);
 
@@ -291,6 +291,18 @@ export default function MeusClientesPage() {
                     </div>
                     {cnpjError && <p className="text-red-500 text-xs mt-1 font-bold">{cnpjError}</p>}
                     {!cnpjError && formData.cnpj.length === 18 && formData.name && <p className="text-green-500 text-xs mt-1">✓ Razão Social preenchida via Receita Federal</p>}
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-bold text-silver-dark">Telefone / WhatsApp</label>
+                    <input 
+                      type="text" 
+                      required
+                      value={formData.phone}
+                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                      className="w-full px-4 py-3 bg-onyx/5 dark:bg-black/20 border border-onyx/10 dark:border-white/10 rounded-lg focus:outline-none focus:border-gold"
+                      placeholder="(47) 99999-9999"
+                    />
                   </div>
 
                   <div className="flex flex-col gap-2">
