@@ -22,7 +22,21 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
 
     if (!tenant) return NextResponse.json({ error: 'Tenant not found' }, { status: 404 });
     
-    const plans = await prisma.plan.findMany();
+    let plans = await prisma.plan.findMany();
+    
+    // Auto-seed plans se estiver vazio no banco (útil para D1 sem seed manual)
+    if (plans.length === 0) {
+      const defaultPlans = [
+        { id: 'start', name: 'Start', basePrice: 199, maxEmployees: 0 },
+        { id: 'gestao', name: 'Gestão', basePrice: 349, maxEmployees: 3 },
+        { id: 'prime', name: 'Prime', basePrice: 549, maxEmployees: 5 },
+      ];
+      for (const p of defaultPlans) {
+        await prisma.plan.create({ data: p });
+      }
+      plans = await prisma.plan.findMany();
+    }
+
     return NextResponse.json({ tenant, plans });
   } catch (error) {
     console.error("GET Tenant error:", error);
