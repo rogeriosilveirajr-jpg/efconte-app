@@ -63,7 +63,8 @@ export default function ClientContracts() {
     }
 
     setIsSigning(true);
-    const signatureData = sigPad.current.getTrimmedCanvas().toDataURL('image/png');
+    // Usa toDataURL direto no componente, pois getTrimmedCanvas pode falhar na versão alpha do react-signature-canvas
+    const signatureData = sigPad.current.toDataURL('image/png');
 
     try {
       const res = await fetch('/api/documents/sign', {
