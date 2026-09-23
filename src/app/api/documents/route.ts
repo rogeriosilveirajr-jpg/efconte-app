@@ -17,7 +17,7 @@ export async function GET(request: Request) {
 
     // VERIFICAÇÃO DE SEGURANÇA CONTRA HACKERS (IDOR)
     // Se não for admin/contador, só pode ver os documentos do PRÓPRIO tenant.
-    if (session.user.role !== 'ADMIN') {
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'CONTADOR') {
       const user = await prisma.user.findUnique({
         where: { email: session.user.email as string },
         include: { tenants: true }
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     const data = await request.json() as any;
     
     // VERIFICAÇÃO DE SEGURANÇA CONTRA HACKERS (IDOR)
-    if (session.user.role !== 'ADMIN') {
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'CONTADOR') {
       const user = await prisma.user.findUnique({
         where: { email: session.user.email as string },
         include: { tenants: true }

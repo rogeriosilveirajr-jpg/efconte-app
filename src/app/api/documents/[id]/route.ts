@@ -21,7 +21,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     }
 
     // IDOR protection
-    if (session.user.role !== 'ADMIN') {
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'CONTADOR') {
       const user = await prisma.user.findUnique({
         where: { email: session.user.email as string },
         include: { tenants: true }

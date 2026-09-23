@@ -35,7 +35,7 @@ export default function LoginPage() {
         .then(res => res.json())
         .then(data => {
           setTimeout(() => {
-            if (data.user?.role === 'ADMIN') {
+            if (data.user?.role === 'ADMIN' || data.user?.role === 'CONTADOR') {
               router.push("/dashboard/contador");
             } else {
               router.push("/dashboard/cliente");

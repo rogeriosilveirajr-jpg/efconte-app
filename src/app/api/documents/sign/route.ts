@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     }
 
     // VERIFICAÇÃO DE SEGURANÇA CONTRA HACKERS (IDOR)
-    if (session.user.role !== 'ADMIN') {
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'CONTADOR') {
       const user = await prisma.user.findUnique({
         where: { email: session.user.email as string },
         include: { tenants: true }

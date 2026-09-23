@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     }
 
     // VERIFICAÇÃO DE SEGURANÇA CONTRA HACKERS (IDOR)
-    if (session.user.role !== 'ADMIN') {
+    if (session.user.role !== 'ADMIN' && session.user.role !== 'CONTADOR') {
       const belongsToTenant = user?.tenants.some(t => t.tenantId === tenantId);
       if (!belongsToTenant) {
         return NextResponse.json({ error: 'Acesso negado. Tentativa de upload em empresa de terceiros bloqueada.' }, { status: 403 });
