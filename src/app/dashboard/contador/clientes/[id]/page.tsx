@@ -293,31 +293,36 @@ function DocumentosTab({ tenant }: { tenant: any }) {
       if (!type) return;
 
       setUploading(true);
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = async () => {
+        const base64Data = (reader.result as string).split(',')[1];
 
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('tenantId', tenant.id);
-      formData.append('type', type.toUpperCase());
+        try {
+          const res = await fetch('/api/documents/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              fileName: file.name,
+              tenantId: tenant.id,
+              type: type.toUpperCase(),
+              fileBase64: base64Data
+            })
+          });
 
-      try {
-        const res = await fetch('/api/documents/upload', {
-          method: 'POST',
-          body: formData
-        });
-
-        if (res.ok) {
-          const data = await res.json() as any as any;
-          alert('Documento enviado com sucesso!');
-          window.location.reload();
-        } else {
-          alert('Erro ao enviar o documento.');
+          if (res.ok) {
+            alert('Documento enviado com sucesso!');
+            window.location.reload();
+          } else {
+            alert('Erro ao enviar o documento.');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Erro ao fazer upload.');
+        } finally {
+          setUploading(false);
         }
-      } catch (err) {
-        console.error(err);
-        alert('Erro ao fazer upload.');
-      } finally {
-        setUploading(false);
-      }
+      };
     }
   };
 

@@ -41,25 +41,40 @@ export default function DocumentosPage() {
   const uploadFileToServer = async (file: File) => {
     setIsUploading(true);
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      // O tenantId será obtido na API através da sessão do usuário
-      
-      const res = await fetch('/api/documents/upload', {
-        method: 'POST',
-        body: formData,
+      await new Promise<void>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = async () => {
+          const base64Data = (reader.result as string).split(',')[1];
+          try {
+            const res = await fetch('/api/documents/upload', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                fileName: file.name,
+                type: 'OUTROS',
+                fileBase64: base64Data
+              })
+            });
+            
+            if (res.ok) {
+              setUploadedFiles(prev => [file.name, ...prev]);
+              resolve();
+            } else {
+              alert('Erro ao enviar documento. Acesso negado ou dados incorretos.');
+              resolve();
+            }
+          } catch (e) {
+            console.error('Upload failed:', e);
+            alert('Erro de conexão ao tentar enviar o documento.');
+            resolve();
+          }
+        };
+        reader.onerror = () => {
+          alert('Erro ao ler arquivo local.');
+          resolve();
+        };
       });
-      
-      if (res.ok) {
-        setUploadedFiles(prev => [file.name, ...prev]);
-      } else {
-        const error = await res.json() as any as any;
-        console.error('API Error:', error);
-        alert('Erro ao enviar documento. O Storage do Firebase bloqueou (CORS ou Permissão).');
-      }
-    } catch (e) {
-      console.error('Upload failed:', e);
-      alert('Erro de conexão ao tentar enviar o documento.');
     } finally {
       setIsUploading(false);
     }

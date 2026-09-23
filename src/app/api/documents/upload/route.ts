@@ -10,9 +10,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const formData = await request.formData();
-    const file = formData.get('file') as File;
-    let tenantId = formData.get('tenantId') as string;
+    const { fileName, tenantId: rawTenantId, type: rawType, fileBase64 } = await request.json() as any;
+    let tenantId = rawTenantId;
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email as string },
@@ -25,7 +24,7 @@ export async function POST(request: Request) {
       }
     }
 
-    if (!file || !tenantId) {
+    if (!fileBase64 || !tenantId) {
       return NextResponse.json({ error: 'Faltam dados' }, { status: 400 });
     }
 
@@ -37,19 +36,14 @@ export async function POST(request: Request) {
       }
     }
 
-    // Convert file to Base64 for database storage
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const base64Data = buffer.toString('base64');
-    
-    const docType = (formData.get('type') as string) || 'OUTROS';
+    const docType = rawType || 'OUTROS';
     
     // Create document in database
     const doc = await prisma.document.create({
       data: {
         tenantId,
-        title: file.name,
-        fileData: base64Data,
+        title: fileName || 'Documento',
+        fileData: fileBase64,
         fileUrl: '', // Will update immediately below
         type: docType,
         status: docType === 'CONTRATO' ? 'PENDING' : null
