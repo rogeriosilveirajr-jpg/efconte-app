@@ -1,3 +1,4 @@
+export const revalidate = 3600;
 import Link from "next/link";
 import Image from "next/image";
 import Header from "@/components/Header";
@@ -6,7 +7,6 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import { Mail, Phone, CheckCircle2, Star, ShieldCheck, Briefcase, TrendingUp, Users, Lock } from "lucide-react";
 import prisma from "@/lib/prisma";
 
-export const revalidate = 3600; // revalidate at most every hour
 
 export default async function Home() {
   
