@@ -30,12 +30,13 @@ export default function LoginPage() {
       setLoading(false);
     } else {
       setSuccess(true);
-      // Busca o perfil real para direcionar baseado na role, e não no email (evita falha de lógica)
-      fetch('/api/profile')
+      // Busca a sessão real para direcionar baseado na role, evitando erros da API de profile
+      fetch('/api/auth/session')
         .then(res => res.json())
         .then(data => {
           setTimeout(() => {
-            if (data.user?.role === 'ADMIN' || data.user?.role === 'CONTADOR') {
+            const role = data?.user?.role?.toUpperCase();
+            if (role === 'ADMIN' || role === 'CONTADOR') {
               router.push("/dashboard/contador");
             } else {
               router.push("/dashboard/cliente");
