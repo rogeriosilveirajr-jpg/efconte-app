@@ -37,7 +37,6 @@ export default function ClientContracts() {
       // Pega o profile e tenantId
       const profileRes = await fetch('/api/profile');
       const profileData = await profileRes.json();
-      const tenantId = profileData.profile?.tenants?.[0]?.tenantId;
       const tenantId = profileData.user?.tenants?.[0]?.tenantId;
 
       if (!tenantId) return;
