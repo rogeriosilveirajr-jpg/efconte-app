@@ -47,34 +47,47 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
 export async function PUT(request: Request, context: { params: Promise<{ id: string }> }) {
   const params = await context.params;
   const { id } = params;
-  const { planId } = await request.json() as any;
 
   try {
-    await prisma.subscription.upsert({
-      where: { tenantId: id },
-      update: { planId },
-      create: { tenantId: id, planId }
+    const { planId } = await request.json() as any;
+    
+    // Avoid prisma.subscription.upsert to prevent potential D1 WASM panics
+    const existing = await prisma.subscription.findUnique({
+      where: { tenantId: id }
     });
+
+    if (existing) {
+      await prisma.subscription.update({
+        where: { tenantId: id },
+        data: { planId }
+      });
+    } else {
+      await prisma.subscription.create({
+        data: { tenantId: id, planId }
+      });
+    }
+
     return NextResponse.json({ success: true });
-  } catch (error) {
-    return NextResponse.json({ error: 'Erro ao alterar plano' }, { status: 500 });
+  } catch (error: any) {
+    console.error("PUT Error:", error.message, error.stack);
+    return NextResponse.json({ error: 'Erro ao alterar plano', details: error.message }, { status: 500 });
   }
 }
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   const params = await context.params;
   const { id } = params;
-  const { action, description, amount } = await request.json() as any;
 
   try {
+    const { action, description, amount } = await request.json() as any;
     if (action === 'ADD_INVOICE_ITEM') {
       await addInvoiceItem(id, description, parseFloat(amount));
       return NextResponse.json({ success: true });
     }
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: 'Erro ao processar' }, { status: 500 });
+  } catch (error: any) {
+    console.error("POST Error:", error.message, error.stack);
+    return NextResponse.json({ error: 'Erro ao processar', details: error.message }, { status: 500 });
   }
 }
 
