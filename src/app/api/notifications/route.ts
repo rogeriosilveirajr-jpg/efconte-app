@@ -42,6 +42,19 @@ export async function POST(request: Request) {
     }
   });
 
+  if (type === 'REUNIAO' && metadata?.date && metadata?.time) {
+    const dateStr = `${metadata.date}T${metadata.time}:00`;
+    await prisma.meeting.create({
+      data: {
+        tenantId,
+        title: "Reunião Estratégica (Solicitada pelo Cliente)",
+        description: message,
+        date: new Date(dateStr),
+        status: "SCHEDULED"
+      }
+    });
+  }
+
   return NextResponse.json({ success: true });
 }
 
