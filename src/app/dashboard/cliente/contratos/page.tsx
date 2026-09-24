@@ -1,4 +1,5 @@
 "use client";
+import toast from "react-hot-toast";
 
 import { useEffect, useState, useRef } from "react";
 
@@ -58,7 +59,7 @@ export default function ClientContracts() {
     if (!selectedContract || !sigPad.current) return;
     
     if (sigPad.current.isEmpty()) {
-      alert("Por favor, faça a sua assinatura no quadro branco.");
+      toast("Por favor, faça a sua assinatura no quadro branco.");
       return;
     }
 
@@ -76,16 +77,16 @@ export default function ClientContracts() {
       });
 
       if (res.ok) {
-        alert("Contrato assinado com sucesso!");
+        toast.success("Contrato assinado com sucesso!");
         setSelectedContract(null);
         fetchContracts();
       } else {
         const err = await res.json() as any as any;
-        alert(err.error || "Erro ao assinar o contrato.");
+        toast.error(err.error || "Erro ao assinar o contrato.");
       }
     } catch (error) {
       console.error(error);
-      alert("Erro ao assinar.");
+      toast.error("Erro ao assinar.");
     } finally {
       setIsSigning(false);
     }

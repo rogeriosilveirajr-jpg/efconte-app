@@ -1,4 +1,5 @@
 "use client";
+import toast from "react-hot-toast";
 
 import { useState, useEffect } from "react";
 import { Store, UserPlus, UserMinus, FileText, CheckCircle2, Info, Star, ShieldCheck, Briefcase } from "lucide-react";
@@ -109,7 +110,7 @@ export default function StorePage() {
 
 
   const handleUpgradeClick = (planName: string) => {
-    alert(`Obrigado pelo interesse no plano ${planName}! Nossa equipe entrará em contato em breve para realizar o upgrade da sua conta e tirar suas dúvidas.`);
+    toast(`Obrigado pelo interesse no plano ${planName}! Nossa equipe entrará em contato em breve para realizar o upgrade da sua conta e tirar suas dúvidas.`);
   };
 
   if (loadingPlans) {

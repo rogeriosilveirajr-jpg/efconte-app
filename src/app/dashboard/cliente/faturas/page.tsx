@@ -1,4 +1,5 @@
 "use client";
+import toast from "react-hot-toast";
 
 import { useState, useEffect } from 'react';
 import { CreditCard, QrCode, Download, CheckCircle2, History, AlertCircle, Receipt, ArrowRight, Loader2 } from "lucide-react";
@@ -62,14 +63,14 @@ export default function FaturasPage() {
           });
 
           if (resInv.ok) {
-            alert('Comprovante enviado com sucesso!');
+            toast.success('Comprovante enviado com sucesso!');
             window.location.reload();
           } else {
-            alert('Erro ao vincular comprovante.');
+            toast.error('Erro ao vincular comprovante.');
           }
         } catch (err) {
           console.error(err);
-          alert('Erro durante o envio.');
+          toast.error('Erro durante o envio.');
         } finally {
           setUploadingReceipt(null);
         }

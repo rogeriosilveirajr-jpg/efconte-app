@@ -28,6 +28,7 @@
     "pg": "^8.23.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "react-hot-toast": "^2.6.1",
     "react-signature-canvas": "^1.1.0-alpha.2",
     "ws": "^8.21.3"
   },

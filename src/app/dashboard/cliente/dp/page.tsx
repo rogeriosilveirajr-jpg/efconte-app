@@ -1,4 +1,5 @@
 "use client";
+import toast from "react-hot-toast";
 
 import { useState, useEffect } from "react";
 import { Users, UserPlus, UserMinus, FileText, Download, Calendar, AlertCircle, ChevronRight, BadgeAlert, Loader2 } from "lucide-react";
@@ -32,11 +33,11 @@ export default function DepartamentoPessoalPage() {
   }, []);
 
   const handleDownload = (title: string) => {
-    alert(`Iniciando download seguro: ${title}. O arquivo será salvo em PDF.`);
+    toast(`Iniciando download seguro: ${title}. O arquivo será salvo em PDF.`);
   };
 
   const handleDownloadAll = () => {
-    alert("Iniciando download do pacote completo (ZIP). Contém Folha, Holerites, FGTS e INSS.");
+    toast("Iniciando download do pacote completo (ZIP). Contém Folha, Holerites, FGTS e INSS.");
   };
 
   // Dados mockados baseados na regra de negócio (Plano Gestão: limite de 3)
@@ -178,7 +179,7 @@ export default function DepartamentoPessoalPage() {
             )}
             
             <button 
-              onClick={() => alert('O pacote ZIP estara disponivel assim que todos os documentos da folha forem fechados pelo contador.')}
+              onClick={() => toast('O pacote ZIP estara disponivel assim que todos os documentos da folha forem fechados pelo contador.')}
               className="mt-4 w-full py-2 bg-onyx/5 dark:bg-white/5 border border-onyx/20 dark:border-white/10 hover:border-gold hover:text-gold rounded-lg font-bold text-sm transition-colors flex items-center justify-center gap-2"
             >
               <Download size={16} /> Baixar Pacote Completo
@@ -284,7 +285,7 @@ function AdmissionWizard({ onClose, onSuccess }: { onClose: () => void, onSucces
         onSuccess(formData.name);
       } else {
         const errorData = await res.json().catch(() => ({})) as any;
-        alert(`Erro ao processar: ${errorData.error || res.statusText}`);
+        toast.error(`Erro ao processar: ${errorData.error || res.statusText}`);
       }
     } catch (e) {
       console.error(e);
@@ -526,7 +527,7 @@ function TerminationWizard({ employees, onClose, onSuccess }: { employees: any[]
         onSuccess(formData.employeeId);
       } else {
         const errorData = await res.json().catch(() => ({})) as any;
-        alert(`Erro ao processar: ${errorData.error || res.statusText}`);
+        toast.error(`Erro ao processar: ${errorData.error || res.statusText}`);
       }
     } catch (e) {
       console.error(e);
@@ -937,7 +938,7 @@ function AlterarDadosWizard({ employees, onClose, onSuccess }: { employees: any[
         onSuccess();
       } else {
         const errorData = await res.json().catch(() => ({})) as any;
-        alert(`Erro ao processar: ${errorData.error || res.statusText}`);
+        toast.error(`Erro ao processar: ${errorData.error || res.statusText}`);
       }
     } catch (e) {
       console.error(e);

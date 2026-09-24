@@ -1,4 +1,5 @@
 "use client";
+import toast from "react-hot-toast";
 
 import { useState, useEffect } from "react";
 import { Calendar as CalendarIcon, Clock, Video, CheckCircle2, XCircle, Plus } from "lucide-react";
@@ -50,7 +51,7 @@ export default function ReunioesPage() {
           if (!phoneNum.startsWith('55')) phoneNum = '55' + phoneNum;
           window.open(`https://wa.me/${phoneNum}?text=${encodeURIComponent(msg)}`, '_blank');
         } else {
-          alert('Link salvo com sucesso, mas o cliente não tem um telefone válido cadastrado para envio do WhatsApp.');
+          toast.success('Link salvo com sucesso, mas o cliente não tem um telefone válido cadastrado para envio do WhatsApp.');
         }
       }
     }

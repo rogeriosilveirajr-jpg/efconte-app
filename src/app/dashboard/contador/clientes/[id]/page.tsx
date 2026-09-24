@@ -1,4 +1,5 @@
 "use client";
+import toast from "react-hot-toast";
 
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -310,20 +311,20 @@ function DocumentosTab({ tenant }: { tenant: any }) {
           });
 
           if (res.ok) {
-            alert('Documento enviado com sucesso!');
+            toast.success('Documento enviado com sucesso!');
             window.location.reload();
           } else {
-            alert('Erro ao enviar o documento.');
+            toast.error('Erro ao enviar o documento.');
           }
         } catch (err) {
           console.error(err);
-          alert('Erro ao fazer upload.');
+          toast.error('Erro ao fazer upload.');
         } finally {
           setUploading(false);
         }
       };
       reader.onerror = () => {
-        alert('Erro ao ler o arquivo.');
+        toast.error('Erro ao ler o arquivo.');
         setUploading(false);
       };
     }
@@ -574,7 +575,7 @@ function RequestDocumentModal({ tenantId, onClose, onSuccess }: { tenantId: stri
       if (res.ok) {
         onSuccess();
       } else {
-        alert("Erro ao solicitar documento");
+        toast.error("Erro ao solicitar documento");
       }
     } catch(e) {
       console.error(e);

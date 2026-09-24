@@ -1,4 +1,5 @@
 "use client";
+import toast from "react-hot-toast";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -128,10 +129,10 @@ export default function MeusClientesPage() {
         setSuccessData({ email: formData.email, password: data.generatedPassword });
         fetchTenants(); // Recarrega a lista
       } else {
-        alert("Erro: " + data.error);
+        toast.error("Erro: " + data.error);
       }
     } catch (e) {
-      alert("Erro de conexão");
+      toast.error("Erro de conexão");
     } finally {
       setIsSubmitting(false);
     }
@@ -262,7 +263,7 @@ export default function MeusClientesPage() {
                         if (!phoneNum.startsWith('55')) phoneNum = '55' + phoneNum;
                         window.open(`https://wa.me/${phoneNum}?text=${encodeURIComponent(msg)}`, '_blank');
                       } else {
-                        alert("O cliente não tem um telefone válido cadastrado.");
+                        toast("O cliente não tem um telefone válido cadastrado.");
                       }
                     }}
                     className="w-full mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"

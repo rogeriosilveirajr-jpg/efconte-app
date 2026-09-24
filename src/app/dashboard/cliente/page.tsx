@@ -1,4 +1,5 @@
 "use client";
+import toast from "react-hot-toast";
 
 import { useEffect, useState } from "react";
 import { Users, FileText, TrendingUp, AlertCircle, Calendar, Clock, CheckCircle2 } from "lucide-react";
@@ -116,10 +117,10 @@ export default function ClientDashboard() {
             // Pra evitar criar uma API nova agora, vamos só excluir o documento de solicitacao
             await fetch('/api/documents/' + docId, { method: 'DELETE' });
             
-            alert('Documento enviado com sucesso!');
+            toast.success('Documento enviado com sucesso!');
             window.location.reload();
           } else {
-            alert('Erro ao enviar documento');
+            toast.error('Erro ao enviar documento');
           }
         } catch (err) {
           console.error(err);

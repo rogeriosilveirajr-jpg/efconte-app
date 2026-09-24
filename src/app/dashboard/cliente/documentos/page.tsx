@@ -1,4 +1,5 @@
 "use client";
+import toast from "react-hot-toast";
 
 import { useState, useRef, useEffect } from "react";
 import { FileText, UploadCloud, FileSpreadsheet, FileCode, CheckCircle2, ChevronRight, FolderArchive } from "lucide-react";
@@ -74,17 +75,17 @@ export default function DocumentosPage() {
               setPastDocuments(prev => [docResponse.document, ...prev]);
               setUploadedFiles(prev => [file.name, ...prev]);
             } else {
-              alert('Erro ao enviar documento. Acesso negado ou dados incorretos.');
+              toast.error('Erro ao enviar documento. Acesso negado ou dados incorretos.');
             }
           } catch (e) {
             console.error('Upload failed:', e);
-            alert('Erro de conexão ao tentar enviar o documento.');
+            toast.error('Erro de conexão ao tentar enviar o documento.');
           } finally {
             resolve();
           }
         };
         reader.onerror = () => {
-          alert('Erro ao ler arquivo local.');
+          toast.error('Erro ao ler arquivo local.');
           resolve();
         };
       });
