@@ -24,7 +24,7 @@ export async function POST(request: Request) {
       }
     }
 
-    if (!fileBase64 || !tenantId) {
+    if ((!fileBase64 && rawType !== 'SOLICITACAO') || !tenantId) {
       return NextResponse.json({ error: 'Faltam dados' }, { status: 400 });
     }
 
@@ -43,10 +43,10 @@ export async function POST(request: Request) {
       data: {
         tenantId,
         title: fileName || 'Documento',
-        fileData: fileBase64,
+        fileData: fileBase64 || null,
         fileUrl: '', // Will update immediately below
         type: docType,
-        status: docType === 'CONTRATO' ? 'PENDING' : null
+        status: docType === 'CONTRATO' ? 'PENDING' : (docType === 'SOLICITACAO' ? 'PENDING' : null)
       }
     });
 

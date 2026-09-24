@@ -278,6 +278,7 @@ function DocumentosTab({ tenant }: { tenant: any }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [sentFiles, setSentFiles] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -332,10 +333,15 @@ function DocumentosTab({ tenant }: { tenant: any }) {
     <div className="flex flex-col gap-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-bold">Cofre Digital (GED)</h3>
-        <button onClick={handleUploadClick} disabled={uploading} className="px-4 py-2 bg-onyx text-gold dark:bg-white/10 text-sm font-bold rounded-lg hover:border-gold transition-colors flex items-center gap-2 border border-transparent disabled:opacity-50">
-          {uploading ? <Loader2 size={16} className="animate-spin" /> : <UploadCloud size={16} />} 
-          {uploading ? "Enviando..." : "Enviar Documento"}
-        </button>
+        <div className="flex gap-2">
+          <button onClick={() => setIsRequestModalOpen(true)} className="px-4 py-2 bg-background border border-gold text-gold text-sm font-bold rounded-lg hover:bg-gold/10 transition-colors flex items-center gap-2">
+            Solicitar ao Cliente
+          </button>
+          <button onClick={handleUploadClick} disabled={uploading} className="px-4 py-2 bg-onyx text-gold dark:bg-white/10 text-sm font-bold rounded-lg hover:border-gold transition-colors flex items-center gap-2 border border-transparent disabled:opacity-50">
+            {uploading ? <Loader2 size={16} className="animate-spin" /> : <UploadCloud size={16} />} 
+            {uploading ? "Enviando..." : "Enviar Documento"}
+          </button>
+        </div>
         <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileChange} />
       </div>
 
@@ -385,6 +391,14 @@ function DocumentosTab({ tenant }: { tenant: any }) {
           </div>
         </div>
       </div>
+      
+      {isRequestModalOpen && (
+        <RequestDocumentModal 
+          tenantId={tenant.id} 
+          onClose={() => setIsRequestModalOpen(false)} 
+          onSuccess={() => window.location.reload()} 
+        />
+      )}
     </div>
   );
 }
@@ -531,6 +545,65 @@ function InvoiceModal({ onClose, onConfirm, processing }: any) {
           >
             {processing ? <Loader2 size={16} className="animate-spin" /> : null}
             Lançar Fatura
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RequestDocumentModal({ tenantId, onClose, onSuccess }: { tenantId: string, onClose: () => void, onSuccess: () => void }) {
+  const [loading, setLoading] = useState(false);
+  const [title, setTitle] = useState("");
+
+  const handleSubmit = async () => {
+    if (!title) return;
+    setLoading(true);
+    try {
+      const res = await fetch('/api/documents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tenantId,
+          title,
+          type: 'SOLICITACAO',
+          fileData: '', // empty
+          fileName: 'solicitacao.txt' // dummy
+        })
+      });
+      if (res.ok) {
+        onSuccess();
+      } else {
+        alert("Erro ao solicitar documento");
+      }
+    } catch(e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+      <div className="bg-background border border-gold/30 p-8 rounded-2xl max-w-sm w-full shadow-2xl relative">
+        <h3 className="text-xl font-bold mb-4">Solicitar Documento</h3>
+        <p className="text-sm text-silver-dark mb-4">O cliente verá esta pendência no painel dele e poderá enviar o arquivo.</p>
+        
+        <div className="flex flex-col gap-2 mb-6">
+          <label className="text-xs font-bold uppercase text-silver-dark">Nome do Documento</label>
+          <input 
+            type="text" 
+            value={title} 
+            onChange={e => setTitle(e.target.value)} 
+            placeholder="Ex: Comprovante de Endereço" 
+            className="w-full bg-onyx/5 dark:bg-white/5 border border-onyx/10 dark:border-white/10 rounded-lg py-2.5 px-4 text-sm focus:outline-none focus:border-gold"
+          />
+        </div>
+
+        <div className="flex justify-end gap-3">
+          <button onClick={onClose} className="px-4 py-2 rounded-lg font-bold text-sm bg-onyx/5 dark:bg-white/5 hover:bg-onyx/10 transition-colors">Cancelar</button>
+          <button onClick={handleSubmit} disabled={!title || loading} className="px-4 py-2 rounded-lg font-bold text-sm bg-gold text-onyx hover:bg-gold-hover transition-colors disabled:opacity-50">
+            {loading ? "Solicitando..." : "Solicitar ao Cliente"}
           </button>
         </div>
       </div>

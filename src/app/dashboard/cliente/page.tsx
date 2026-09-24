@@ -12,16 +12,25 @@ export default function ClientDashboard() {
   const [selectedTime, setSelectedTime] = useState("");
   const [meetingScheduled, setMeetingScheduled] = useState(false);
   const [allMeetings, setAllMeetings] = useState<any[]>([]);
+  const [documents, setDocuments] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch('/api/profile')
-      .then(res => res.json())
-      .then(data => {
-        if (data.user) {
-          setProfile(data.user);
-        }
-      })
-      .finally(() => setLoading(false));
+    Promise.all([
+      fetch('/api/profile'),
+      fetch('/api/documents')
+    ])
+    .then(async ([resProfile, resDocs]) => {
+      const dataProfile = await resProfile.json();
+      const dataDocs = await resDocs.json();
+      
+      if (dataProfile.user) {
+        setProfile(dataProfile.user);
+      }
+      if (dataDocs.documents) {
+        setDocuments(dataDocs.documents);
+      }
+    })
+    .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -77,6 +86,49 @@ export default function ClientDashboard() {
       const d = new Date(m.date);
       return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
     });
+
+  
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>, docId: string) => {
+    const file = e.target.files?.[0];
+    if (file && profile) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = async () => {
+        const base64 = reader.result?.toString();
+        setLoading(true);
+        try {
+          // 1. Faz o upload e cria um documento tipo OUTROS para o contador ver
+          const tenantId = profile.tenants[0].tenantId;
+          const res = await fetch('/api/documents/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              fileName: file.name,
+              fileBase64: base64,
+              tenantId,
+              type: 'OUTROS' // documento real
+            })
+          });
+
+          if (res.ok) {
+            // 2. Avisa que a pendência foi concluída marcando-a como 'COMPLETED'
+            // Pra facilitar no MVP, vamos chamar a api genérica de documents PUT, se existir, senão só exclui a solicitação original...
+            // Pra evitar criar uma API nova agora, vamos só excluir o documento de solicitacao
+            await fetch('/api/documents/' + docId, { method: 'DELETE' });
+            
+            alert('Documento enviado com sucesso!');
+            window.location.reload();
+          } else {
+            alert('Erro ao enviar documento');
+          }
+        } catch (err) {
+          console.error(err);
+        } finally {
+          setLoading(false);
+        }
+      };
+    }
+  };
 
   const tenantData = profile?.tenants?.[0]?.tenant;
   const currentPlan = tenantData?.subscription?.plan?.name || "Sem Plano";
@@ -157,32 +209,33 @@ export default function ClientDashboard() {
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* Main DRE Chart Placeholder */}
+          {/* Pendências do Contador */}
           <div className="lg:col-span-2 glass-panel p-6 rounded-2xl flex flex-col h-80">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="font-bold text-sm">Evolução do Faturamento (DRE)</h3>
-              <select className="bg-background border border-[var(--color-border)] rounded-lg text-xs px-2 py-1 outline-none text-[var(--color-text)]">
-                <option>2026 (Semestral)</option>
-              </select>
+              <h3 className="font-bold text-sm">Pendências de Documentos</h3>
             </div>
             
-            <div className="flex-1 w-full flex items-end justify-between gap-2 md:gap-6 px-2">
-              {loading ? (
-                Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="w-full bg-[var(--brand-onyx)] rounded-t-sm animate-pulse" style={{ height: `${20 + i * 10}%` }}></div>
-                ))
+            <div className="flex-1 overflow-y-auto pr-2 flex flex-col gap-3">
+              {documents.filter(d => d.type === 'SOLICITACAO').length === 0 ? (
+                <div className="flex-1 flex flex-col items-center justify-center text-center opacity-50 mt-12">
+                   <CheckCircle2 size={48} className="text-green-500 mb-2" />
+                   <p className="text-sm font-bold">Tudo em ordem!</p>
+                   <p className="text-xs mt-1">Nenhum documento pendente com a contabilidade.</p>
+                </div>
               ) : (
-                Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="w-full bg-[var(--brand-gold)]/80 hover:bg-[var(--brand-gold)] rounded-t-sm transition-all relative group" style={{ height: `${Math.random() * 60 + 20}%` }}>
-                    <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-[var(--brand-onyx)] text-[var(--color-text)] text-[10px] px-2 py-1 rounded transition-opacity">
-                      R$ 45k
+                documents.filter(d => d.type === 'SOLICITACAO').map(doc => (
+                  <div key={doc.id} className="p-4 bg-background border border-[var(--brand-gold)]/50 rounded-xl flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <span className="font-bold text-sm">{doc.title}</span>
+                      <span className="text-xs text-[var(--brand-silver-dark)]">Solicitado em {new Date(doc.createdAt).toLocaleDateString('pt-BR')}</span>
                     </div>
+                    <label className="px-4 py-2 bg-[var(--brand-gold)] text-[var(--color-primary)] text-xs font-bold rounded-lg cursor-pointer hover:bg-[var(--brand-gold-hover)] transition-colors">
+                      Enviar Arquivo
+                      <input type="file" className="hidden" onChange={(e) => handleUpload(e, doc.id)} />
+                    </label>
                   </div>
                 ))
               )}
-            </div>
-            <div className="flex justify-between mt-4 text-xs text-[var(--brand-silver-dark)] px-2 font-mono">
-              <span>Jan</span><span>Fev</span><span>Mar</span><span>Abr</span><span>Mai</span><span>Jun</span>
             </div>
           </div>
 
