@@ -56,12 +56,15 @@ export async function addInvoiceItem(tenantId: string, description: string, amou
   });
 
   // Update invoice total
-  await prisma.invoice.update({
-    where: { id: invoice.id },
-    data: {
-      totalAmount: { increment: amount }
-    }
-  });
+  const currentInvoice = await prisma.invoice.findUnique({ where: { id: invoice.id } });
+  if (currentInvoice) {
+    await prisma.invoice.update({
+      where: { id: invoice.id },
+      data: {
+        totalAmount: currentInvoice.totalAmount + amount
+      }
+    });
+  }
 
   return item;
 }
