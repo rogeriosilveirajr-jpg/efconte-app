@@ -110,7 +110,9 @@ export default function StorePage() {
 
 
   const handleUpgradeClick = (planName: string) => {
-    toast(`Obrigado pelo interesse no plano ${planName}! Nossa equipe entrará em contato em breve para realizar o upgrade da sua conta e tirar suas dúvidas.`);
+    toast.success('Redirecionando para o WhatsApp...');
+    const message = encodeURIComponent(`Olá, gostaria de solicitar o upgrade da minha conta para o plano *${planName}*. Podem me ajudar?`);
+    window.open(`https://wa.me/5547992187868?text=${message}`, '_blank');
   };
 
   if (loadingPlans) {
