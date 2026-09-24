@@ -241,19 +241,7 @@ export default function ClientDashboard() {
 
           {/* Quick Indicators */}
           <div className="flex flex-col gap-6">
-            <IndicatorCard 
-              title="Lucratividade Atual" 
-              value="24.5%" 
-              trend="+2.1%" 
-              loading={loading} 
-            />
-            <IndicatorCard 
-              title="Impostos no Semestre" 
-              value="R$ 18.430" 
-              trend="-1.5%" 
-              loading={loading} 
-              isWarning
-            />
+
             <div className="glass-panel p-6 rounded-2xl flex-1 flex flex-col justify-center items-center text-center gap-3">
               <AlertCircle className="text-[var(--brand-gold)]" size={24} />
               <p className="text-sm text-[var(--brand-silver-dark)]">Sua reunião semestral de resultados está disponível.</p>
@@ -353,18 +341,3 @@ export default function ClientDashboard() {
   );
 }
 
-function IndicatorCard({ title, value, trend, loading, isWarning = false }: { title: string, value: string, trend: string, loading: boolean, isWarning?: boolean }) {
-  return (
-    <div className="glass-panel p-6 rounded-2xl flex flex-col justify-center">
-      <span className="text-xs text-[var(--brand-silver-dark)] uppercase font-bold tracking-wider mb-2">{title}</span>
-      {loading ? (
-        <div className="h-8 w-24 bg-[var(--color-border)] rounded animate-pulse"></div>
-      ) : (
-        <div className="flex items-end gap-3">
-          <span className="text-2xl font-bold">{value}</span>
-          <span className={`text-xs font-bold mb-1 ${isWarning ? 'text-red-500' : 'text-green-500'}`}>{trend}</span>
-        </div>
-      )}
-    </div>
-  );
-}
