@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { name, role } = await request.json() as any;
+  const { name, role, salary } = await request.json() as any;
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email as string },
@@ -65,6 +65,8 @@ export async function POST(request: Request) {
   const employee = await prisma.employee.create({
     data: {
       name,
+      role: role || null,
+      salary: salary ? parseFloat(salary.toString()) : null,
       tenantId
     }
   });
@@ -130,4 +132,51 @@ export async function DELETE(request: Request) {
   });
 
   return NextResponse.json({ success: true });
+}
+
+export async function PUT(request: Request) {
+  const session = await auth();
+  if (!session || !session.user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const { id, role, salary } = await request.json() as any;
+
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email as string },
+    include: { tenants: true }
+  });
+
+  if (!user || user.tenants.length === 0) {
+    return NextResponse.json({ error: 'Tenant not found' }, { status: 400 });
+  }
+
+  const tenantId = user.tenants[0].tenantId;
+
+  // Ensure employee belongs to tenant
+  const employee = await prisma.employee.findUnique({ where: { id } });
+  if (!employee || employee.tenantId !== tenantId) {
+    return NextResponse.json({ error: 'Employee not found' }, { status: 404 });
+  }
+
+  // Update employee
+  const updated = await prisma.employee.update({
+    where: { id },
+    data: {
+      role: role || null,
+      salary: salary !== undefined ? salary : null
+    }
+  });
+
+  // Criar notificação para o contador sobre a alteração
+  await prisma.notification.create({
+    data: {
+      tenantId,
+      type: 'DOCUMENTO', // Podemos usar DOCUMENTO ou um novo tipo para "ALTERACAO"
+      message: `Cliente alterou os dados de ${employee.name} (Cargo: ${role || '-'}, Salário: ${salary ? 'R$ '+salary : '-'}).`,
+      metadata: JSON.stringify({ employeeId: id, action: 'UPDATE_DATA' })
+    }
+  });
+
+  return NextResponse.json({ success: true, employee: updated });
 }

@@ -75,7 +75,7 @@ export default function DepartamentoPessoalPage() {
       </section>
 
       {/* Ações Rápidas */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <section className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <ActionButton 
           icon={<UserPlus size={20} />} 
           title="Nova Admissão" 
@@ -87,6 +87,12 @@ export default function DepartamentoPessoalPage() {
           title="Desligamento" 
           desc="R$ 150 por rescisão"
           onClick={() => setActiveWizard('demissao')} 
+        />
+        <ActionButton 
+          icon={<FileText size={20} />} 
+          title="Alterar Dados" 
+          desc="Função e Salário"
+          onClick={() => setActiveWizard('alterar')} 
         />
         <ActionButton 
           icon={<Calendar size={20} />} 
@@ -220,6 +226,17 @@ export default function DepartamentoPessoalPage() {
         />
       )}
 
+      {activeWizard === 'alterar' && (
+        <AlterarDadosWizard 
+          employees={employees}
+          onClose={() => setActiveWizard(null)}
+          onSuccess={() => {
+            fetchEmployees(); // refetch
+            setActiveWizard(null);
+          }}
+        />
+      )}
+
       {/* MODAL DE DETALHES DO COLABORADOR */}
       {selectedEmployee && (
         <EmployeeDetailsModal 
@@ -253,7 +270,11 @@ function AdmissionWizard({ onClose, onSuccess }: { onClose: () => void, onSucces
       const res = await fetch('/api/employees', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: formData.name, role: formData.role })
+        body: JSON.stringify({ 
+          name: formData.name, 
+          role: formData.role, 
+          salary: formData.salary ? parseFloat(formData.salary.replace(/[^\d.,]/g, '').replace(',', '.')) : null
+        })
       });
       if (res.ok) {
         onSuccess(formData.name);
@@ -851,19 +872,140 @@ function EmployeeDetailsModal({ employee, onClose }: { employee: any, onClose: (
               </div>
               <div className="flex flex-col gap-1 text-right">
                 <span className="text-[10px] uppercase font-bold text-silver-dark tracking-wider">Salário Base</span>
-                <span className="font-bold text-sm">R$ --</span>
+                <span className="font-bold text-sm">{employee.salary ? `R$ ${employee.salary.toLocaleString('pt-BR', {minimumFractionDigits: 2})}` : 'R$ --'}</span>
               </div>
             </div>
           </div>
           
           <div className="flex flex-col gap-2 mt-2">
-            <p className="text-xs text-silver-dark text-center">Para alterar os dados, gerar recibos ou solicitar férias/desligamento, utilize os botões de ação rápida no painel principal.</p>
+            <button onClick={() => setActiveWizard('alterar')} className="w-full text-xs text-silver-dark hover:text-gold border border-silver-dark/30 hover:border-gold py-1.5 rounded transition-colors">
+              Alterar Função / Salário
+            </button>
+            <p className="text-[10px] text-silver-dark text-center mt-1">Para gerar recibos ou solicitar férias/desligamento, utilize as ações rápidas.</p>
           </div>
         </div>
 
         <div className="mt-8 pt-4 border-t border-onyx/10 dark:border-white/5 text-right">
           <button onClick={onClose} className="px-6 py-2.5 rounded-lg font-bold text-sm bg-onyx text-gold dark:bg-gold dark:text-onyx hover:opacity-90 transition-opacity">
             Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AlterarDadosWizard({ employees, onClose, onSuccess }: { employees: any[], onClose: () => void, onSuccess: () => void }) {
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    employeeId: "",
+    role: "",
+    salary: ""
+  });
+
+  const selectedEmp = employees.find(e => e.id === formData.employeeId);
+
+  // When selecting an employee, populate existing data
+  useEffect(() => {
+    if (selectedEmp) {
+      setFormData(prev => ({
+        ...prev,
+        role: selectedEmp.role || "",
+        salary: selectedEmp.salary ? selectedEmp.salary.toString() : ""
+      }));
+    }
+  }, [selectedEmp]);
+
+  const handleSubmit = async () => {
+    if (!formData.employeeId) return;
+    setLoading(true);
+    try {
+      const res = await fetch('/api/employees', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: formData.employeeId,
+          role: formData.role,
+          salary: formData.salary ? parseFloat(formData.salary.replace(/[^\d.,]/g, '').replace(',', '.')) : null
+        })
+      });
+      if (res.ok) {
+        onSuccess();
+      } else {
+        const errorData = await res.json().catch(() => ({})) as any;
+        alert(`Erro ao processar: ${errorData.error || res.statusText}`);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+      <div className="bg-background border border-gold/30 p-8 rounded-2xl max-w-lg w-full shadow-2xl relative">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h3 className="text-xl font-bold flex items-center gap-2 mb-1">
+              <FileText size={24} className="text-gold" /> Alterar Dados
+            </h3>
+            <p className="text-sm text-silver-dark">Atualize o cargo e salário do colaborador.</p>
+          </div>
+          <button onClick={onClose} className="text-silver-dark hover:text-foreground">✕</button>
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-bold uppercase text-silver-dark">Selecionar Colaborador</label>
+            <select 
+              value={formData.employeeId}
+              onChange={e => setFormData({ ...formData, employeeId: e.target.value })}
+              className="w-full bg-onyx/5 dark:bg-white/5 border border-onyx/10 dark:border-white/10 rounded-lg py-2.5 px-4 text-sm focus:outline-none focus:border-gold text-foreground"
+            >
+              <option value="">Selecione...</option>
+              {employees.map(e => (
+                <option key={e.id} value={e.id}>{e.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {selectedEmp && (
+            <div className="flex flex-col gap-4 animate-in fade-in">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold uppercase text-silver-dark">Novo Cargo</label>
+                <input 
+                  type="text" 
+                  value={formData.role}
+                  onChange={e => setFormData({ ...formData, role: e.target.value })}
+                  placeholder="Ex: Gerente Administrativo" 
+                  className="w-full bg-onyx/5 dark:bg-white/5 border border-onyx/10 dark:border-white/10 rounded-lg py-2.5 px-4 text-sm focus:outline-none focus:border-gold" 
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold uppercase text-silver-dark">Novo Salário Base (R$)</label>
+                <input 
+                  type="text" 
+                  value={formData.salary}
+                  onChange={e => setFormData({ ...formData, salary: e.target.value })}
+                  placeholder="4.500,00" 
+                  className="w-full bg-onyx/5 dark:bg-white/5 border border-onyx/10 dark:border-white/10 rounded-lg py-2.5 px-4 text-sm focus:outline-none focus:border-gold" 
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-8 flex gap-3">
+          <button onClick={onClose} className="flex-1 py-2.5 rounded-lg font-bold text-sm bg-onyx/5 dark:bg-white/5 hover:bg-onyx/10 dark:hover:bg-white/10 transition-colors">
+            Voltar
+          </button>
+          <button 
+            onClick={handleSubmit} 
+            disabled={!formData.employeeId || loading} 
+            className="flex-1 py-2.5 rounded-lg font-bold text-sm bg-gold text-onyx hover:bg-gold-hover transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            {loading ? "Salvando..." : "Salvar Alterações"}
           </button>
         </div>
       </div>
