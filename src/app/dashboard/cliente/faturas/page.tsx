@@ -198,12 +198,6 @@ export default function FaturasPage() {
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-message-circle"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
               <span className="font-bold text-base">Negociar Pagamento no WhatsApp</span>
             </button>
-            
-            <label className="w-full py-3 mt-3 rounded-xl border border-gold text-gold hover:bg-gold/10 flex items-center justify-center gap-2 transition-colors cursor-pointer text-sm font-bold">
-              {uploadingReceipt === pendingInvoice?.id ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle2 size={18} />}
-              {uploadingReceipt === pendingInvoice?.id ? 'Enviando...' : 'Anexar Comprovante'}
-              <input type="file" className="hidden" onChange={(e) => handleUploadReceipt(e, pendingInvoice.id)} disabled={uploadingReceipt !== null} />
-            </label>
           </div>
         </div>
 
@@ -211,10 +205,15 @@ export default function FaturasPage() {
 
       {/* Histórico de Faturas */}
       <section className="mt-8">
-        <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-          <History size={20} className="text-gold" />
-          Histórico de Pagamentos
-        </h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-bold flex items-center gap-2">
+            <History size={20} className="text-gold" />
+            Histórico de Pagamentos
+          </h2>
+          <a href="/api/invoices/report" target="_blank" className="px-4 py-2 bg-onyx/5 dark:bg-white/5 hover:bg-gold/10 text-gold text-xs font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center gap-2">
+            <Download size={14} /> Relatório em PDF
+          </a>
+        </div>
         
         <div className="glass-panel border border-onyx/30 dark:border-white/15 rounded-2xl overflow-hidden shadow-sm">
           <table className="w-full text-left text-sm">
@@ -291,9 +290,9 @@ function TableRow({ month, date, amount, status, hasExtra = false, isSetup = fal
           </a>
         ) : null}
         
-        <button onClick={() => alert('O relatório completo da fatura em PDF estará disponível em breve.')} className="text-silver-dark group-hover:text-gold transition-colors inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider">
+        <a href="/api/invoices/report" target="_blank" className="text-silver-dark group-hover:text-gold transition-colors inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider">
           Recibo PDF <Download size={14} />
-        </button>
+        </a>
       </td>
     </tr>
   );
