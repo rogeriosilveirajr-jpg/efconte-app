@@ -44,7 +44,7 @@ export async function POST(request: Request) {
   });
 
   if (type === 'REUNIAO' && metadata?.date && metadata?.time) {
-    const dateStr = `${metadata.date}T${metadata.time}:00`;
+    const dateStr = `${metadata.date}T${metadata.time}:00-03:00`;
     await prisma.meeting.create({
       data: {
         tenantId,

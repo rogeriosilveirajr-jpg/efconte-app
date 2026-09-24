@@ -11,6 +11,7 @@ export default function ClientDashboard() {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [meetingScheduled, setMeetingScheduled] = useState(false);
+  const [allMeetings, setAllMeetings] = useState<any[]>([]);
 
   useEffect(() => {
     fetch('/api/profile')
@@ -22,6 +23,17 @@ export default function ClientDashboard() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (isMeetingModalOpen) {
+      fetch('/api/admin/meetings')
+        .then(res => res.json())
+        .then(data => {
+           if (data.meetings) setAllMeetings(data.meetings);
+        })
+        .catch(console.error);
+    }
+  }, [isMeetingModalOpen]);
 
   const handleSchedule = async () => {
     if (!selectedDate || !selectedTime) return;
@@ -52,6 +64,19 @@ export default function ClientDashboard() {
       }, 3000);
     }, 1000);
   };
+
+  const bookedTimes = allMeetings
+    .filter(m => m.status === 'SCHEDULED')
+    .filter(m => {
+      const d = new Date(m.date);
+      // Extrair YYYY-MM-DD no fuso do Brasil usando Sweden (sv-SE) ou Canada (en-CA) locale
+      const dStr = d.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+      return dStr === selectedDate;
+    })
+    .map(m => {
+      const d = new Date(m.date);
+      return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+    });
 
   const tenantData = profile?.tenants?.[0]?.tenant;
   const currentPlan = tenantData?.subscription?.plan?.name || "Sem Plano";
@@ -229,19 +254,25 @@ export default function ClientDashboard() {
                   <div className="flex flex-col gap-2">
                     <label className="text-xs font-bold uppercase text-[var(--brand-silver-dark)]">Horários Livres do Contador</label>
                     <div className="grid grid-cols-3 gap-2">
-                      {["09:00", "10:30", "14:00", "15:30", "16:00"].map((time) => (
-                        <button
-                          key={time}
-                          onClick={() => setSelectedTime(time)}
-                          className={`py-2 rounded-lg text-sm font-bold border transition-colors ${
-                            selectedTime === time 
-                              ? "bg-[var(--brand-gold)] text-[var(--color-primary)] border-[var(--brand-gold)]" 
-                              : "bg-[var(--color-surface)] border-[var(--color-border)] hover:border-[var(--brand-gold)]/50"
-                          }`}
-                        >
-                          {time}
-                        </button>
-                      ))}
+                      {["09:00", "10:30", "14:00", "15:30", "16:00"].map((time) => {
+                        const isBooked = bookedTimes.includes(time);
+                        return (
+                          <button
+                            key={time}
+                            disabled={isBooked}
+                            onClick={() => setSelectedTime(time)}
+                            className={`py-2 rounded-lg text-sm font-bold border transition-colors ${
+                              isBooked
+                                ? "bg-[var(--color-border)] text-[var(--brand-silver-dark)] opacity-50 cursor-not-allowed border-transparent"
+                                : selectedTime === time 
+                                ? "bg-[var(--brand-gold)] text-[var(--color-primary)] border-[var(--brand-gold)]" 
+                                : "bg-[var(--color-surface)] border-[var(--color-border)] hover:border-[var(--brand-gold)]/50"
+                            }`}
+                          >
+                            {time} {isBooked && "(Ocupado)"}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
