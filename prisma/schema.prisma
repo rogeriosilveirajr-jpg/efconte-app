@@ -88,6 +88,7 @@ model Invoice {
   dueDate     DateTime
   totalAmount Float
   status      String         @default("Pending") // Pending | Paid
+  receiptUrl  String?
   tenant      Tenant         @relation(fields: [tenantId], references: [id])
   items       InvoiceItem[]
 }

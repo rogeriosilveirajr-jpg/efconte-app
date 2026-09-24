@@ -39,16 +39,24 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       return new NextResponse('No file data', { status: 404 });
     }
 
-    const buffer = Buffer.from(doc.fileData, 'base64');
-    const binaryString = atob(doc.fileData);
+    let base64Data = doc.fileData;
+    if (base64Data.includes(',')) {
+      base64Data = base64Data.split(',')[1];
+    }
+
+    const binaryString = atob(base64Data);
     const bytes = new Uint8Array(binaryString.length);
     for (let i = 0; i < binaryString.length; i++) {
         bytes[i] = binaryString.charCodeAt(i);
     }
     
+    // Fallback: se não for PDF (ex: PNG), ajustar o Content-Type
+    const isImage = doc.fileData.includes('image/');
+    const contentType = isImage ? 'image/png' : 'application/pdf';
+
     return new NextResponse(bytes, {
       headers: {
-        'Content-Type': 'application/pdf', 
+        'Content-Type': contentType, 
         'Content-Disposition': `inline; filename="${doc.title}"`
       }
     });

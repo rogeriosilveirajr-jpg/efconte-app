@@ -21,6 +21,62 @@ export default function FaturasPage() {
       });
   }, []);
 
+  
+  const [uploadingReceipt, setUploadingReceipt] = useState<string | null>(null);
+
+  const handleUploadReceipt = (e: React.ChangeEvent<HTMLInputElement>, invoiceId: string) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = async () => {
+        setUploadingReceipt(invoiceId);
+        try {
+          const profileRes = await fetch('/api/profile');
+          const profileData = await profileRes.json();
+          const tenantId = profileData.user?.tenants?.[0]?.tenantId;
+          
+          if (!tenantId) throw new Error("Tenant não encontrado");
+
+          const resDoc = await fetch('/api/documents/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              fileName: 'Comprovante - ' + file.name,
+              fileBase64: reader.result?.toString(),
+              tenantId,
+              type: 'OUTROS'
+            })
+          });
+
+          if (!resDoc.ok) throw new Error("Erro ao fazer upload do documento");
+          const docData = await resDoc.json();
+
+          const resInv = await fetch('/api/invoices', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              invoiceId,
+              receiptUrl: docData.document.fileUrl
+            })
+          });
+
+          if (resInv.ok) {
+            alert('Comprovante enviado com sucesso!');
+            window.location.reload();
+          } else {
+            alert('Erro ao vincular comprovante.');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Erro durante o envio.');
+        } finally {
+          setUploadingReceipt(null);
+        }
+      };
+    }
+  };
+
   const pendingInvoice = invoices.find(inv => inv.status === 'Pending');
   const pastInvoices = invoices.filter(inv => inv.status === 'Paid');
 
@@ -142,6 +198,12 @@ export default function FaturasPage() {
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-message-circle"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
               <span className="font-bold text-base">Negociar Pagamento no WhatsApp</span>
             </button>
+            
+            <label className="w-full py-3 mt-3 rounded-xl border border-gold text-gold hover:bg-gold/10 flex items-center justify-center gap-2 transition-colors cursor-pointer text-sm font-bold">
+              {uploadingReceipt === pendingInvoice?.id ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle2 size={18} />}
+              {uploadingReceipt === pendingInvoice?.id ? 'Enviando...' : 'Anexar Comprovante'}
+              <input type="file" className="hidden" onChange={(e) => handleUploadReceipt(e, pendingInvoice.id)} disabled={uploadingReceipt !== null} />
+            </label>
           </div>
         </div>
 
@@ -176,6 +238,10 @@ export default function FaturasPage() {
                     amount={formatMoney(inv.totalAmount)} 
                     status="Pago" 
                     hasExtra={inv.items.length > 1}
+                    receiptUrl={inv.receiptUrl}
+                    invoiceId={inv.id}
+                    onUploadReceipt={handleUploadReceipt}
+                    uploadingReceipt={uploadingReceipt}
                   />
                 ))
               ) : (
@@ -198,7 +264,7 @@ export default function FaturasPage() {
 }
 
 // Helper Components
-function TableRow({ month, date, amount, status, hasExtra = false, isSetup = false }: any) {
+function TableRow({ month, date, amount, status, hasExtra = false, isSetup = false, receiptUrl, invoiceId, onUploadReceipt, uploadingReceipt }: any) {
   return (
     <tr className="hover:bg-onyx/5 dark:hover:bg-white/5 transition-colors group cursor-pointer">
       <td className="px-6 py-4 flex flex-col gap-1">
@@ -213,9 +279,20 @@ function TableRow({ month, date, amount, status, hasExtra = false, isSetup = fal
           <CheckCircle2 size={14} /> {status}
         </span>
       </td>
-      <td className="px-6 py-4 text-right">
-        <button className="text-silver-dark group-hover:text-gold transition-colors inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider">
-          PDF <ArrowRight size={14} />
+      <td className="px-6 py-4 text-right flex gap-3 justify-end items-center">
+        {!receiptUrl && onUploadReceipt && invoiceId ? (
+          <label className="text-gold group-hover:text-gold-hover transition-colors inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider cursor-pointer">
+            {uploadingReceipt === invoiceId ? 'Enviando...' : 'Anexar Comprovante'}
+            <input type="file" className="hidden" onChange={(e) => onUploadReceipt(e, invoiceId)} disabled={uploadingReceipt === invoiceId} />
+          </label>
+        ) : receiptUrl ? (
+          <a href={receiptUrl} target="_blank" className="text-green-500 hover:text-green-600 transition-colors inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider">
+            Comprovante <ArrowRight size={14} />
+          </a>
+        ) : null}
+        
+        <button onClick={() => alert('O relatório completo da fatura em PDF estará disponível em breve.')} className="text-silver-dark group-hover:text-gold transition-colors inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider">
+          Recibo PDF <Download size={14} />
         </button>
       </td>
     </tr>

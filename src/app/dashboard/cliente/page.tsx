@@ -204,7 +204,7 @@ export default function ClientDashboard() {
       <section className="mt-4">
         <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
           <FileText size={20} className="text-[var(--brand-gold)]" />
-          Desempenho Financeiro
+          Pendências e Relatórios
         </h2>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
