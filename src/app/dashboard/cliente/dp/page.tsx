@@ -231,7 +231,11 @@ export default function DepartamentoPessoalPage() {
           employees={employees}
           onClose={() => setActiveWizard(null)}
           onSuccess={() => {
-            fetchEmployees(); // refetch
+            fetch('/api/employees')
+              .then(res => res.json())
+              .then(data => {
+                if (data.employees) setEmployees(data.employees);
+              });
             setActiveWizard(null);
           }}
         />
